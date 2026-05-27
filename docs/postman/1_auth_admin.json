@@ -1,0 +1,301 @@
+{
+  "info": {
+    "name": "GeoTree — 1. Auth & Admin",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Authentication (Mobile + Admin) and Admin Management APIs"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5030" },
+    { "key": "TOKEN", "value": "PASTE_YOUR_JWT_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Health Check",
+      "item": [
+        {
+          "name": "GET /api/health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/health", "host": ["{{BASE_URL}}"], "path": ["api","health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Mobile Auth",
+      "item": [
+        {
+          "name": "Check Mobile Number",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mobile\": \"9876543210\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/auth/check-number", "host": ["{{BASE_URL}}"], "path": ["api","auth","check-number"] }
+          }
+        },
+        {
+          "name": "Verify OTP (Mobile)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"mobile\": \"9876543210\",\n  \"otp\": \"123456\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/auth/verify-otp", "host": ["{{BASE_URL}}"], "path": ["api","auth","verify-otp"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "var res = pm.response.json();",
+                  "if (res.token) { pm.collectionVariables.set('TOKEN', res.token); }",
+                  "if (res.data && res.data.token) { pm.collectionVariables.set('TOKEN', res.data.token); }"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@geotree.com\",\n  \"password\": \"admin123\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/auth/login", "host": ["{{BASE_URL}}"], "path": ["api","admin","auth","login"] }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@geotree.com\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/auth/forgot-password", "host": ["{{BASE_URL}}"], "path": ["api","admin","auth","forgot-password"] }
+          }
+        },
+        {
+          "name": "Verify OTP (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@geotree.com\",\n  \"otp\": \"123456\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/auth/verify-otp", "host": ["{{BASE_URL}}"], "path": ["api","admin","auth","verify-otp"] }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"email\": \"admin@geotree.com\",\n  \"otp\": \"123456\",\n  \"new_password\": \"newSecure123\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/auth/reset-password", "host": ["{{BASE_URL}}"], "path": ["api","admin","auth","reset-password"] }
+          }
+        },
+        {
+          "name": "Admin Logout",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/auth/logout", "host": ["{{BASE_URL}}"], "path": ["api","admin","auth","logout"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin Management",
+      "item": [
+        {
+          "name": "Dashboard Stats",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/stats", "host": ["{{BASE_URL}}"], "path": ["api","admin","stats"] }
+          }
+        },
+        {
+          "name": "List Admins",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"search\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/admins/list", "host": ["{{BASE_URL}}"], "path": ["api","admin","admins","list"] }
+          }
+        },
+        {
+          "name": "List Users",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"search\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/users/list", "host": ["{{BASE_URL}}"], "path": ["api","admin","users","list"] }
+          }
+        },
+        {
+          "name": "Add Admin (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Test Admin", "type": "text" },
+                { "key": "email", "value": "testadmin@geotree.com", "type": "text" },
+                { "key": "password", "value": "secure123", "type": "text" },
+                { "key": "role", "value": "admin", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/admin/users", "host": ["{{BASE_URL}}"], "path": ["api","admin","users"] }
+          }
+        },
+        {
+          "name": "Update Admin (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "name", "value": "Updated Admin", "type": "text" },
+                { "key": "role", "value": "finance", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/admin/admins/update", "host": ["{{BASE_URL}}"], "path": ["api","admin","admins","update"] }
+          }
+        },
+        {
+          "name": "Delete Admin",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/admins/delete", "host": ["{{BASE_URL}}"], "path": ["api","admin","admins","delete"] }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/users/delete", "host": ["{{BASE_URL}}"], "path": ["api","admin","users","delete"] }
+          }
+        },
+        {
+          "name": "Get Admin Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/profile", "host": ["{{BASE_URL}}"], "path": ["api","admin","profile"] }
+          }
+        },
+        {
+          "name": "Change Admin Password",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"old_password\": \"admin123\",\n  \"new_password\": \"newSecure456\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin/profile/password", "host": ["{{BASE_URL}}"], "path": ["api","admin","profile","password"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Profile (App User)",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/profile/details", "host": ["{{BASE_URL}}"], "path": ["api","profile","details"] }
+          }
+        },
+        {
+          "name": "Update Profile (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Updated Name", "type": "text" },
+                { "key": "profile_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/profile/update", "host": ["{{BASE_URL}}"], "path": ["api","profile","update"] }
+          }
+        },
+        {
+          "name": "Upload Profile Image",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "profile_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/profile/upload-image", "host": ["{{BASE_URL}}"], "path": ["api","profile","upload-image"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit Logs",
+      "item": [
+        {
+          "name": "Get Audit Logs",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20,\n  \"entity\": \"Admin\",\n  \"action\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/audit/list", "host": ["{{BASE_URL}}"], "path": ["api","audit","list"] }
+          }
+        }
+      ]
+    }
+  ]
+}

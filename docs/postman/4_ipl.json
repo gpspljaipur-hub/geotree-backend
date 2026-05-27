@@ -1,0 +1,395 @@
+{
+  "info": {
+    "name": "GeoTree — 4. IPL (Campaigns, Tournaments, Teams, Matches)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "All IPL / Dot Ball feature APIs"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5030" },
+    { "key": "TOKEN", "value": "PASTE_YOUR_JWT_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Campaigns",
+      "item": [
+        {
+          "name": "List Campaigns",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/campaigns/list", "host": ["{{BASE_URL}}"], "path": ["api","ipl","campaigns","list"] }
+          }
+        },
+        {
+          "name": "Add Campaign",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"campaign_name\": \"IPL 2025\",\n  \"start_date\": \"2025-03-15\",\n  \"end_date\": \"2025-05-30\",\n  \"description\": \"IPL cricket campaign for tree plantation\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/campaigns/add", "host": ["{{BASE_URL}}"], "path": ["api","ipl","campaigns","add"] }
+          }
+        },
+        {
+          "name": "Update Campaign",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"campaign_id\": \"64f1234abc5678def9012345\",\n  \"campaign_name\": \"IPL 2025 Updated\",\n  \"end_date\": \"2025-06-01\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/campaigns/update", "host": ["{{BASE_URL}}"], "path": ["api","ipl","campaigns","update"] }
+          }
+        },
+        {
+          "name": "Delete Campaign",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"campaign_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/campaigns/delete", "host": ["{{BASE_URL}}"], "path": ["api","ipl","campaigns","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "IPL Config",
+      "item": [
+        {
+          "name": "Get Config Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/config/details", "host": ["{{BASE_URL}}"], "path": ["api","ipl","config","details"] }
+          }
+        },
+        {
+          "name": "Update Config",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"trees_per_dot_ball\": 1,\n  \"max_dot_balls_per_match\": 50,\n  \"active_campaign_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/config", "host": ["{{BASE_URL}}"], "path": ["api","ipl","config"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Tournaments",
+      "item": [
+        {
+          "name": "List Tournaments",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments/list", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments","list"] }
+          }
+        },
+        {
+          "name": "Tournament Leaderboard",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments/leaderboard", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments","leaderboard"] }
+          }
+        },
+        {
+          "name": "Add Tournament (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "tournament_name", "value": "IPL 2025", "type": "text" },
+                { "key": "campaign_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "start_date", "value": "2025-03-20", "type": "text" },
+                { "key": "end_date", "value": "2025-05-25", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments"] }
+          }
+        },
+        {
+          "name": "Update Tournament (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "tournament_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "tournament_name", "value": "IPL 2025 Updated", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments"] }
+          }
+        },
+        {
+          "name": "Delete Tournament (by URL param)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments","64f1234abc5678def9012345"] }
+          }
+        },
+        {
+          "name": "Delete Tournament (by body)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/tournaments/delete", "host": ["{{BASE_URL}}"], "path": ["api","ipl","tournaments","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Teams",
+      "item": [
+        {
+          "name": "List Teams",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\",\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams/list", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams","list"] }
+          }
+        },
+        {
+          "name": "Add Team (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "team_name", "value": "Mumbai Indians", "type": "text" },
+                { "key": "team_full_name", "value": "Mumbai Indians FC", "type": "text" },
+                { "key": "team_color", "value": "#004BA0", "type": "text" },
+                { "key": "primary_color", "value": "#D1AB3E", "type": "text" },
+                { "key": "team_logo", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams"] }
+          }
+        },
+        {
+          "name": "Update Team (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "team_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "team_name", "value": "MI Updated", "type": "text" },
+                { "key": "team_logo", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams/update", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams","update"] }
+          }
+        },
+        {
+          "name": "Delete Team",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"team_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams/delete", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams","delete"] }
+          }
+        },
+        {
+          "name": "Team Details (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"team_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams/details", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams","details"] }
+          }
+        },
+        {
+          "name": "Team Pre-Plant Support (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"team_id\": \"64f1234abc5678def9012345\",\n  \"tournament_id\": \"64f1234abc5678def9012346\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/teams/support", "host": ["{{BASE_URL}}"], "path": ["api","ipl","teams","support"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Matches",
+      "item": [
+        {
+          "name": "List Matches",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\",\n  \"match_status\": \"Upcoming\",\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/list", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","list"] }
+          }
+        },
+        {
+          "name": "Add Match",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\",\n  \"team1_id\": \"64f1234abc5678def9012346\",\n  \"team2_id\": \"64f1234abc5678def9012347\",\n  \"match_date\": \"2025-04-10\",\n  \"match_time\": \"19:30\",\n  \"venue\": \"Wankhede Stadium\",\n  \"match_type\": \"League\",\n  \"match_status\": \"Upcoming\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches"] }
+          }
+        },
+        {
+          "name": "Update Match",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"match_id\": \"64f1234abc5678def9012345\",\n  \"match_status\": \"Live\",\n  \"venue\": \"Eden Gardens\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/update", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","update"] }
+          }
+        },
+        {
+          "name": "Delete Match",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"match_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/delete", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","delete"] }
+          }
+        },
+        {
+          "name": "Get Dot Ball Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"match_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/dot-balls/details", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","dot-balls","details"] }
+          }
+        },
+        {
+          "name": "Update Dot Balls",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"match_id\": \"64f1234abc5678def9012345\",\n  \"team_id\": \"64f1234abc5678def9012346\",\n  \"dot_balls\": 12\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/dot-balls", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","dot-balls"] }
+          }
+        },
+        {
+          "name": "Support Trees for Match (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"match_id\": \"64f1234abc5678def9012345\",\n  \"team_id\": \"64f1234abc5678def9012346\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/matches/support", "host": ["{{BASE_URL}}"], "path": ["api","ipl","matches","support"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "IPL App Features",
+      "item": [
+        {
+          "name": "Dot Ball History (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/history", "host": ["{{BASE_URL}}"], "path": ["api","ipl","history"] }
+          }
+        },
+        {
+          "name": "Get Team Challenge",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/challenge", "host": ["{{BASE_URL}}"], "path": ["api","ipl","challenge"] }
+          }
+        },
+        {
+          "name": "Update Team Challenge (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"tournament_id\": \"64f1234abc5678def9012345\",\n  \"team_id\": \"64f1234abc5678def9012346\",\n  \"challenge_target\": 100\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/ipl/challenge/update", "host": ["{{BASE_URL}}"], "path": ["api","ipl","challenge","update"] }
+          }
+        }
+      ]
+    }
+  ]
+}

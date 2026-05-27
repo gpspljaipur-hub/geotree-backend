@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoTree | Certificate of Plantation</title>
+    <!-- Premium Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --primary: {
+                    {
+                    primaryColor
+                }
+            }
+
+            ;
+
+            --primary-light: {
+                    {
+                    primaryColor
+                }
+            }
+
+            15;
+
+            --primary-muted: {
+                    {
+                    primaryColor
+                }
+            }
+
+            33;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background: #eef2f3;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+
+        .outfit {
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .playfair {
+            font-family: 'Playfair Display', serif;
+        }
+
+        /* A4 Landscape Ratio: 1.414 */
+        .certificate-canvas {
+            width: 1120px;
+            height: 792px;
+            background: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Organic Background Layers */
+        .bg-layer-1 {
+            position: absolute;
+            top: -100px;
+            right: -100px;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .bg-layer-2 {
+            position: absolute;
+            bottom: -150px;
+            left: -150px;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, var(--primary-light) 0%, transparent 70%);
+            border-radius: 50%;
+            z-index: 1;
+        }
+
+        .pattern-overlay {
+            position: absolute;
+            inset: 0;
+            opacity: 0.03;
+            background-image: url('{{previewImage}}');
+            background-size: 200px;
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        /* Sophisticated Border */
+        .main-border {
+            position: absolute;
+            inset: 40px;
+            border: 1px solid var(--primary-muted);
+            z-index: 10;
+            pointer-events: none;
+        }
+
+        .accent-border {
+            position: absolute;
+            inset: 55px;
+            border: 3px solid var(--primary);
+            z-index: 10;
+            pointer-events: none;
+            clip-path: polygon(0 0, 15% 0, 15% 3px, 3px 3px, 3px 15%, 0 15%, 0 0, 85% 0, 100% 0, 100% 15%, 97% 15%, 97% 3px, 85% 3px, 85% 0, 100% 85%, 100% 100%, 85% 100%, 85% 97%, 97% 97%, 97% 85%, 100% 85%, 15% 100%, 0 100%, 0 85%, 3px 85%, 3px 97%, 15% 97%, 15% 100%);
+        }
+
+        /* Leaf Accents (SVG) */
+        .leaf-decor {
+            position: absolute;
+            width: 150px;
+            height: 150px;
+            fill: var(--primary);
+            opacity: 0.08;
+            z-index: 1;
+        }
+
+        /* Glassmorphism Badge */
+        .tree-badge {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--primary-muted);
+            padding: 12px 24px;
+            border-radius: 100px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+
+            .certificate-canvas {
+                box-shadow: none;
+                border: none;
+                width: 100%;
+                height: 100%;
+            }
+        }
+    </style>
+</head>
+
+<body class="flex items-center justify-center min-h-screen p-12">
+
+    <div class="certificate-canvas">
+        <!-- Background Decor -->
+        <div class="bg-layer-1"></div>
+        <div class="bg-layer-2"></div>
+        <div class="pattern-overlay"></div>
+        <div class="main-border"></div>
+        <div class="accent-border"></div>
+
+        <!-- Leaf SVGs (absolute positioned) -->
+        <svg class="leaf-decor" style="top: 60px; left: 60px; transform: rotate(-45deg);" viewBox="0 0 24 24">
+            <path
+                d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z" />
+        </svg>
+        <svg class="leaf-decor" style="bottom: 60px; right: 60px; transform: rotate(135deg);" viewBox="0 0 24 24">
+            <path
+                d="M17,8C8,10 5.9,16.17 3.82,21.34L5.71,22L6.66,19.7C7.14,19.87 7.64,20 8,20C19,20 22,3 22,3C21,5 14,5.25 9,6.25C4,7.25 2,11.5 2,13.5C2,15.5 3.75,17.25 3.75,17.25C7,8 17,8 17,8Z" />
+        </svg>
+
+        <!-- Content Shell -->
+        <div class="relative z-20 flex flex-col items-center justify-between h-full p-24">
+
+            <!-- 1. Header Section -->
+            <div class="text-center">
+                <div class="flex items-center justify-center mb-8">
+                    <div class="w-16 h-16 rounded-2xl flex items-center justify-center rotate-45"
+                        style="background: var(--primary);">
+                        <svg class="w-8 h-8 -rotate-45 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            stroke-width="2.5">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </div>
+                </div>
+                <h1 class="outfit text-6xl font-black uppercase tracking-[0.25em] mb-4" style="color: var(--primary);">
+                    {{title}}
+                </h1>
+                <p class="playfair text-2xl text-gray-400 italic font-medium tracking-widest">
+                    {{subTitle}}
+                </p>
+            </div>
+
+            <!-- 2. Central Recipient Section -->
+            <div class="text-center w-full max-w-4xl">
+                <p class="text-gray-400 uppercase tracking-[0.3em] font-medium text-sm mb-8">This certificate is proudly
+                    presented to</p>
+
+                <h2 class="playfair text-7xl font-bold text-gray-900 mb-8 border-b-2 inline-block px-12"
+                    style="border-color: var(--primary-muted);">
+                    {{user_name}}
+                </h2>
+
+                <div class="text-2xl leading-relaxed text-gray-500 font-light italic mb-10 max-w-2xl mx-auto">
+                    {{description}}
+                </div>
+
+                <div class="tree-badge">
+                    <svg class="w-6 h-6" style="color: var(--primary);" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M12 19V5M5 12l7-7 7 7" />
+                    </svg>
+                    <span class="outfit font-bold text-2xl uppercase tracking-tighter" style="color: var(--primary);">
+                        {{trees_count}} Trees Native Plantation
+                    </span>
+                </div>
+            </div>
+
+            <!-- 3. Footer Section -->
+            <div class="w-full flex justify-between items-end px-4">
+
+                <!-- Left: Verification -->
+                <div class="space-y-6">
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Authenticated ID</p>
+                        <p class="font-mono text-xs text-gray-700 font-bold">{{certificate_id}}</p>
+                    </div>
+                    <div>
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Issue Date</p>
+                        <p class="outfit font-semibold text-gray-800 text-sm">{{date}}</p>
+                    </div>
+                </div>
+
+                <!-- Center: Signature/Seal -->
+                <div class="flex flex-col items-center">
+                    <div class="mb-4 text-center">
+                        <p class="playfair italic text-3xl font-medium mb-1" style="color: var(--primary);">{{tagline}}
+                        </p>
+                        <div class="h-0.5 w-48 mx-auto bg-gradient-to-r from-transparent via-{{primaryColor}} to-transparent"
+                            style="background-image: linear-gradient(to right, transparent, var(--primary), transparent);">
+                        </div>
+                    </div>
+                    <p class="text-[10px] text-gray-400 uppercase tracking-widest">Environmental Stewardship Seal</p>
+                </div>
+
+                <!-- Right: QR & Site -->
+                <div class="flex items-end gap-8">
+                    <div class="text-right">
+                        <p class="text-[10px] text-gray-400 uppercase tracking-widest mb-1">Plantation Site</p>
+                        <p class="outfit font-bold text-gray-800 text-sm">{{site_name}}</p>
+                    </div>
+                    <div class="bg-white p-2 border border-gray-100 rounded-xl shadow-sm">
+                        <div class="w-20 h-20 flex items-center justify-center">
+                            {{qr_code}}
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</body>
+
+</html>

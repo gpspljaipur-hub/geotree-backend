@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{title}}</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f3f4f6;
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+        .font-serif {
+            font-family: 'Playfair Display', serif;
+        }
+        @media print {
+            @page {
+                size: landscape;
+                margin: 0;
+            }
+            body { 
+                background-color: white !important; 
+                margin: 0; 
+                padding: 0; 
+            }
+            #certificate-render-node { 
+                transform: scale(1) !important; 
+                margin: 0 auto !important; 
+                border: none !important; 
+                box-shadow: none !important; 
+                width: 100% !important; 
+                height: 100% !important; 
+                page-break-after: avoid;
+            }
+            /* Hide print button when printing */
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body>
+    <div id="certificate-render-node" class="relative text-gray-900 shadow-sm overflow-hidden flex flex-col items-center p-12 border-[12px] border-double shadow-xl" style="border-color: rgb(30, 92, 56); background-color: white; width: 900px; height: 640px; min-width: 900px; min-height: 640px; transform: scale(1); transform-origin: center top;"><div class="absolute inset-0 opacity-30 bg-white"></div><div class="absolute top-4 left-4 w-16 h-16 border-t-2 border-l-2 opacity-50" style="border-color: rgb(30, 92, 56);"></div><div class="absolute top-4 right-4 w-16 h-16 border-t-2 border-r-2 opacity-50" style="border-color: rgb(30, 92, 56);"></div><div class="absolute bottom-4 left-4 w-16 h-16 border-b-2 border-l-2 opacity-50" style="border-color: rgb(30, 92, 56);"></div><div class="absolute bottom-4 right-4 w-16 h-16 border-b-2 border-r-2 opacity-50" style="border-color: rgb(30, 92, 56);"></div><div class="relative z-10 text-center flex flex-col items-center justify-between h-full w-full"><div class="absolute top-1 left-2"><img alt="GeoTree" class="h-10 object-contain opacity-90" src="http://localhost:5173/src/assets/logo.png"></div><div class="absolute top-1 right-2 text-right space-y-0.5"><div class="flex items-center justify-end gap-2"><span class="text-[9px] uppercase tracking-[0.1em] text-gray-400 font-bold">Issued Date:</span><span class="text-xs font-bold text-gray-700">2/27/2026</span></div><div class="flex items-center justify-end gap-2"><span class="text-[9px] uppercase tracking-[0.1em] text-gray-400 font-bold">Certificate ID:</span><span class="text-xs font-bold text-gray-700">GT-2026-0001</span></div></div><div class="flex flex-col items-center w-full"><div class="mb-4"><svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#1e5c38" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-award" aria-hidden="true"><path d="m15.477 12.89 1.515 8.526a.5.5 0 0 1-.81.47l-3.58-2.687a1 1 0 0 0-1.197 0l-3.586 2.686a.5.5 0 0 1-.81-.469l1.514-8.526"></path><circle cx="12" cy="8" r="6"></circle></svg></div><h2 class="text-4xl font-serif font-bold uppercase tracking-widest text-gray-800 break-words w-full px-10">Certificate of Appreciation</h2><p class="text-sm font-medium uppercase tracking-widest text-gray-500 mt-2">Special Recognition</p><div class="mt-8 mb-4 w-full px-10"><p class="text-gray-600 italic mb-2 text-lg">This is proudly presented to</p><h3 class="text-5xl font-serif font-bold text-gray-900 border-b-2 pb-2 inline-block max-w-full break-words" style="border-color: rgb(30, 92, 56);">John Doe</h3></div><p class="text-gray-700 max-w-2xl mx-auto leading-relaxed text-lg break-words whitespace-pre-line px-10 min-h-[3em]">Marking the occasion of [Occasion Name], this certificate acknowledges your thoughtful contribution of planting {{qty}} trees under the {{site}} initiative.
+Your gesture celebrates the moment while nurturing a greener and more sustainable future.<br><span class="font-bold block mt-2 text-[#254AA5] italic opacity-80 group-hover:opacity-100 transition-opacity whitespace-pre-line">Nurturing a greener and more sustainable future</span></p></div><div class="w-full flex justify-center items-end px-16 pb-12"><div class="text-center"><div class="w-64 h-0.5 bg-gray-400 mx-auto"></div></div></div></div></div>
+    
+    <script>
+        // Check for download parameter to trigger auto-print
+        const urlParams = new URLSearchParams(window.location.search);
+        if(urlParams.get('download') === 'true') {
+            window.onload = function() {
+                window.print();
+            };
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,362 @@
+{
+  "info": {
+    "name": "GeoTree — 5. Carbon, Monitoring, Admin UI, Occasion Public",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Carbon Footprint, Monitoring, Admin UI dynamic models, Occasion public routes"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5030" },
+    { "key": "TOKEN", "value": "PASTE_YOUR_JWT_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Carbon Footprint",
+      "item": [
+        {
+          "name": "GET Transport Types (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/carbon/transport-types", "host": ["{{BASE_URL}}"], "path": ["api","carbon","transport-types"] }
+          }
+        },
+        {
+          "name": "GET Electricity Types (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/carbon/electricity-types", "host": ["{{BASE_URL}}"], "path": ["api","carbon","electricity-types"] }
+          }
+        },
+        {
+          "name": "GET Food Types (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/carbon/food-types", "host": ["{{BASE_URL}}"], "path": ["api","carbon","food-types"] }
+          }
+        },
+        {
+          "name": "GET Emission Factors (Public)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/carbon/emission-factors", "host": ["{{BASE_URL}}"], "path": ["api","carbon","emission-factors"] }
+          }
+        },
+        {
+          "name": "Calculate Carbon Footprint",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"transport\": [\n    { \"type_id\": \"64f1234abc5678def9012345\", \"distance_km\": 50, \"frequency\": \"Daily\" }\n  ],\n  \"electricity\": [\n    { \"type_id\": \"64f1234abc5678def9012346\", \"units\": 200 }\n  ],\n  \"food\": [\n    { \"type_id\": \"64f1234abc5678def9012347\", \"servings_per_day\": 3 }\n  ]\n}"
+            },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/calculate", "host": ["{{BASE_URL}}"], "path": ["api","carbon","calculate"] }
+          }
+        },
+        {
+          "name": "Get Carbon Result",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"calculation_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/result", "host": ["{{BASE_URL}}"], "path": ["api","carbon","result"] }
+          }
+        },
+        {
+          "name": "Carbon History",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/history", "host": ["{{BASE_URL}}"], "path": ["api","carbon","history"] }
+          }
+        },
+        {
+          "name": "List Emission Factors (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/emission-factors/list", "host": ["{{BASE_URL}}"], "path": ["api","carbon","emission-factors","list"] }
+          }
+        },
+        {
+          "name": "Add Emission Factor (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "name", "value": "Car - Petrol", "type": "text" },
+                { "key": "type", "value": "transport", "type": "text" },
+                { "key": "factor", "value": "0.21", "type": "text" },
+                { "key": "unit", "value": "kg CO2/km", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/emission-factors/add", "host": ["{{BASE_URL}}"], "path": ["api","carbon","emission-factors","add"] }
+          }
+        },
+        {
+          "name": "Update Emission Factor (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "factor", "value": "0.19", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/emission-factors/update", "host": ["{{BASE_URL}}"], "path": ["api","carbon","emission-factors","update"] }
+          }
+        },
+        {
+          "name": "Delete Emission Factor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/emission-factors/delete", "host": ["{{BASE_URL}}"], "path": ["api","carbon","emission-factors","delete"] }
+          }
+        },
+        {
+          "name": "List Offset Factors (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/offset-factors/list", "host": ["{{BASE_URL}}"], "path": ["api","carbon","offset-factors","list"] }
+          }
+        },
+        {
+          "name": "Add Offset Factor",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Deciduous Tree\",\n  \"offset_per_year\": 22,\n  \"unit\": \"kg CO2/year\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/offset-factors/add", "host": ["{{BASE_URL}}"], "path": ["api","carbon","offset-factors","add"] }
+          }
+        },
+        {
+          "name": "Update Offset Factor",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\",\n  \"offset_per_year\": 25\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/offset-factors/update", "host": ["{{BASE_URL}}"], "path": ["api","carbon","offset-factors","update"] }
+          }
+        },
+        {
+          "name": "Delete Offset Factor",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/carbon/offset-factors/delete", "host": ["{{BASE_URL}}"], "path": ["api","carbon","offset-factors","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Monitoring",
+      "item": [
+        {
+          "name": "GET Monitoring Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/monitoring/data?site_id=64f1234abc5678def9012345&page=1&limit=10",
+              "host": ["{{BASE_URL}}"], "path": ["api","monitoring","data"],
+              "query": [
+                { "key": "site_id", "value": "64f1234abc5678def9012345" },
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Add Monitoring Record (multipart, max 5 files)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "plantation_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "notes", "value": "Tree is growing well", "type": "text" },
+                { "key": "health_status", "value": "Healthy", "type": "text" },
+                { "key": "media", "type": "file", "src": "" },
+                { "key": "media", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/monitoring/add", "host": ["{{BASE_URL}}"], "path": ["api","monitoring","add"] }
+          }
+        },
+        {
+          "name": "Update Monitoring Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"monitoring_id\": \"64f1234abc5678def9012345\",\n  \"notes\": \"Updated: tree is flourishing\",\n  \"health_status\": \"Excellent\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/monitoring/update", "host": ["{{BASE_URL}}"], "path": ["api","monitoring","update"] }
+          }
+        },
+        {
+          "name": "Delete Monitoring Record",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"monitoring_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/monitoring/delete", "host": ["{{BASE_URL}}"], "path": ["api","monitoring","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin UI (Dynamic Models)",
+      "item": [
+        {
+          "name": "Get All Models",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/admin-ui/models", "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models"] }
+          }
+        },
+        {
+          "name": "Get Model Records (User)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": {
+              "raw": "{{BASE_URL}}/api/admin-ui/models/User?page=1&limit=10",
+              "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models","User"],
+              "query": [{ "key": "page", "value": "1" }, { "key": "limit", "value": "10" }]
+            }
+          }
+        },
+        {
+          "name": "Get Single Record",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/admin-ui/models/User/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models","User","64f1234abc5678def9012345"] }
+          }
+        },
+        {
+          "name": "Create Record",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Test User\",\n  \"email\": \"test@geotree.com\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin-ui/models/User", "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models","User"] }
+          }
+        },
+        {
+          "name": "Update Record",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"name\": \"Updated Name\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/admin-ui/models/User/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models","User","64f1234abc5678def9012345"] }
+          }
+        },
+        {
+          "name": "Delete Record",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/admin-ui/models/User/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["api","admin-ui","models","User","64f1234abc5678def9012345"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Occasion Public (Standalone Form)",
+      "item": [
+        {
+          "name": "Get Occasion Details",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/occasion/list/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["occasion","list","64f1234abc5678def9012345"] }
+          }
+        },
+        {
+          "name": "Get States for Form",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/occasion/states", "host": ["{{BASE_URL}}"], "path": ["occasion","states"] }
+          }
+        },
+        {
+          "name": "Get Projects for State",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"state_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/occasion/projects", "host": ["{{BASE_URL}}"], "path": ["occasion","projects"] }
+          }
+        },
+        {
+          "name": "Get Species for Project",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"project_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/occasion/species", "host": ["{{BASE_URL}}"], "path": ["occasion","species"] }
+          }
+        }
+      ]
+    }
+  ]
+}

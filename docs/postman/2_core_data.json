@@ -1,0 +1,459 @@
+{
+  "info": {
+    "name": "GeoTree — 2. Core Data (State, Site, Species, Category)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "State, Site/Project, Species, Category, Location Data APIs"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5030" },
+    { "key": "TOKEN", "value": "PASTE_YOUR_JWT_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "State",
+      "item": [
+        {
+          "name": "List States",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20,\n  \"status\": true\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/state/list", "host": ["{{BASE_URL}}"], "path": ["api","state","list"] }
+          }
+        },
+        {
+          "name": "State Hierarchy",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/state/hierarchy", "host": ["{{BASE_URL}}"], "path": ["api","state","hierarchy"] }
+          }
+        },
+        {
+          "name": "Add State (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "state_name", "value": "Maharashtra", "type": "text" },
+                { "key": "state_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/state/add", "host": ["{{BASE_URL}}"], "path": ["api","state","add"] }
+          }
+        },
+        {
+          "name": "Update State (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "state_name", "value": "Maharashtra Updated", "type": "text" },
+                { "key": "state_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/state/update", "host": ["{{BASE_URL}}"], "path": ["api","state","update"] }
+          }
+        },
+        {
+          "name": "Delete State",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/state/delete", "host": ["{{BASE_URL}}"], "path": ["api","state","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Site / Project",
+      "item": [
+        {
+          "name": "List Sites",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"state_id\": \"\",\n  \"status\": true\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/site/list", "host": ["{{BASE_URL}}"], "path": ["api","site","list"] }
+          }
+        },
+        {
+          "name": "Add Site (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "site_name", "value": "Green Valley Site", "type": "text" },
+                { "key": "state_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "location", "value": "Near River", "type": "text" },
+                { "key": "site_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/site/add", "host": ["{{BASE_URL}}"], "path": ["api","site","add"] }
+          }
+        },
+        {
+          "name": "Update Site (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "site_name", "value": "Updated Site Name", "type": "text" },
+                { "key": "site_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/site/update", "host": ["{{BASE_URL}}"], "path": ["api","site","update"] }
+          }
+        },
+        {
+          "name": "Delete Site",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/site/delete", "host": ["{{BASE_URL}}"], "path": ["api","site","delete"] }
+          }
+        },
+        {
+          "name": "Upload Boundary File (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "site_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/site/upload-boundary", "host": ["{{BASE_URL}}"], "path": ["api","site","upload-boundary"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Species",
+      "item": [
+        {
+          "name": "List Species",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/species/list?page=1&limit=20&search=",
+              "host": ["{{BASE_URL}}"], "path": ["api","species","list"],
+              "query": [
+                { "key": "page", "value": "1" },
+                { "key": "limit", "value": "20" },
+                { "key": "search", "value": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Species Details",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/species/details", "host": ["{{BASE_URL}}"], "path": ["api","species","details"] }
+          }
+        },
+        {
+          "name": "Add Species (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "species_name", "value": "Neem", "type": "text" },
+                { "key": "botanical_name", "value": "Azadirachta indica", "type": "text" },
+                { "key": "category_id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "species_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/species/add", "host": ["{{BASE_URL}}"], "path": ["api","species","add"] }
+          }
+        },
+        {
+          "name": "Update Species (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "species_name", "value": "Updated Neem", "type": "text" },
+                { "key": "species_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/species/update", "host": ["{{BASE_URL}}"], "path": ["api","species","update"] }
+          }
+        },
+        {
+          "name": "Delete Species",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/species/delete", "host": ["{{BASE_URL}}"], "path": ["api","species","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Category",
+      "item": [
+        {
+          "name": "List Categories",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/category/list", "host": ["{{BASE_URL}}"], "path": ["api","category","list"] }
+          }
+        },
+        {
+          "name": "Add Category (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "category_name", "value": "Fruit Trees", "type": "text" },
+                { "key": "category_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/category/add", "host": ["{{BASE_URL}}"], "path": ["api","category","add"] }
+          }
+        },
+        {
+          "name": "Update Category (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "category_name", "value": "Updated Category", "type": "text" },
+                { "key": "category_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/category/update", "host": ["{{BASE_URL}}"], "path": ["api","category","update"] }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/category/delete", "host": ["{{BASE_URL}}"], "path": ["api","category","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Location Data",
+      "item": [
+        {
+          "name": "Get States (dropdown)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/location-data/states", "host": ["{{BASE_URL}}"], "path": ["api","location-data","states"] }
+          }
+        },
+        {
+          "name": "Get Districts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/location-data/districts?state_id=64f1234abc5678def9012345",
+              "host": ["{{BASE_URL}}"], "path": ["api","location-data","districts"],
+              "query": [{ "key": "state_id", "value": "64f1234abc5678def9012345" }]
+            }
+          }
+        },
+        {
+          "name": "Get Blocks",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/location-data/blocks?district_id=64f1234abc5678def9012345",
+              "host": ["{{BASE_URL}}"], "path": ["api","location-data","blocks"],
+              "query": [{ "key": "district_id", "value": "64f1234abc5678def9012345" }]
+            }
+          }
+        },
+        {
+          "name": "Get GPs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/location-data/gps?block_id=64f1234abc5678def9012345",
+              "host": ["{{BASE_URL}}"], "path": ["api","location-data","gps"],
+              "query": [{ "key": "block_id", "value": "64f1234abc5678def9012345" }]
+            }
+          }
+        },
+        {
+          "name": "Get Villages",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{BASE_URL}}/api/location-data/villages?gp_id=64f1234abc5678def9012345",
+              "host": ["{{BASE_URL}}"], "path": ["api","location-data","villages"],
+              "query": [{ "key": "gp_id", "value": "64f1234abc5678def9012345" }]
+            }
+          }
+        },
+        {
+          "name": "Upload Location Excel (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "file", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/location-data/upload-excel", "host": ["{{BASE_URL}}"], "path": ["api","location-data","upload-excel"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Master (Nursery & Templates)",
+      "item": [
+        {
+          "name": "List Nurseries",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/master/nursery/list", "host": ["{{BASE_URL}}"], "path": ["api","master","nursery","list"] }
+          }
+        },
+        {
+          "name": "Add Nursery (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "nursery_name", "value": "Green Nursery", "type": "text" },
+                { "key": "location", "value": "Pune", "type": "text" },
+                { "key": "nursery_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/master/nursery/add", "host": ["{{BASE_URL}}"], "path": ["api","master","nursery","add"] }
+          }
+        },
+        {
+          "name": "Update Nursery (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "nursery_name", "value": "Updated Nursery", "type": "text" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/master/nursery/update", "host": ["{{BASE_URL}}"], "path": ["api","master","nursery","update"] }
+          }
+        },
+        {
+          "name": "Delete Nursery",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/master/nursery/delete", "host": ["{{BASE_URL}}"], "path": ["api","master","nursery","delete"] }
+          }
+        },
+        {
+          "name": "List Certificate Templates",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/master/template/list", "host": ["{{BASE_URL}}"], "path": ["api","master","template","list"] }
+          }
+        },
+        {
+          "name": "Add Certificate Template (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "template_name", "value": "Standard Certificate", "type": "text" },
+                { "key": "background_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/master/template/add", "host": ["{{BASE_URL}}"], "path": ["api","master","template","add"] }
+          }
+        },
+        {
+          "name": "Delete Certificate Template",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/master/template/delete", "host": ["{{BASE_URL}}"], "path": ["api","master","template","delete"] }
+          }
+        }
+      ]
+    }
+  ]
+}

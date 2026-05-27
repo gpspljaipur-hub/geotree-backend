@@ -1,0 +1,404 @@
+{
+  "info": {
+    "name": "GeoTree — 3. Plantation, Orders, Payment, Certificate",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": "Plantation, Occasion Types, Orders, Payment, Certificate APIs"
+  },
+  "variable": [
+    { "key": "BASE_URL", "value": "http://localhost:5030" },
+    { "key": "TOKEN", "value": "PASTE_YOUR_JWT_TOKEN_HERE" }
+  ],
+  "item": [
+    {
+      "name": "Occasion Types",
+      "item": [
+        {
+          "name": "List Occasions",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/occasions/list", "host": ["{{BASE_URL}}"], "path": ["api","plantation","occasions","list"] }
+          }
+        },
+        {
+          "name": "Add Occasion (multipart)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "occasion_name", "value": "Birthday", "type": "text" },
+                { "key": "occasion_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/occasions/add", "host": ["{{BASE_URL}}"], "path": ["api","plantation","occasions","add"] }
+          }
+        },
+        {
+          "name": "Update Occasion (multipart)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "id", "value": "64f1234abc5678def9012345", "type": "text" },
+                { "key": "occasion_name", "value": "Anniversary", "type": "text" },
+                { "key": "occasion_image", "type": "file", "src": "" }
+              ]
+            },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/occasions/update", "host": ["{{BASE_URL}}"], "path": ["api","plantation","occasions","update"] }
+          }
+        },
+        {
+          "name": "Delete Occasion",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/occasions/delete", "host": ["{{BASE_URL}}"], "path": ["api","plantation","occasions","delete"] }
+          }
+        },
+        {
+          "name": "Regenerate Occasion Forms",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/occasions/regenerate-forms", "host": ["{{BASE_URL}}"], "path": ["api","plantation","occasions","regenerate-forms"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Plantation",
+      "item": [
+        {
+          "name": "Get Plant List",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"site_id\": \"64f1234abc5678def9012345\",\n  \"page\": 1,\n  \"limit\": 20\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plants/list", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plants","list"] }
+          }
+        },
+        {
+          "name": "List All Plantations (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"state_id\": \"\",\n  \"site_id\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plantations/list", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plantations","list"] }
+          }
+        },
+        {
+          "name": "Submit Plantation (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"site_id\": \"64f1234abc5678def9012345\",\n  \"species_id\": \"64f1234abc5678def9012346\",\n  \"occasion_id\": \"64f1234abc5678def9012347\",\n  \"trees_count\": 5,\n  \"latitude\": 18.5204,\n  \"longitude\": 73.8567,\n  \"notes\": \"Planted near the river\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plantations/add", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plantations","add"] }
+          }
+        },
+        {
+          "name": "Plantation History (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plantations/history", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plantations","history"] }
+          }
+        },
+        {
+          "name": "Update Plantation (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\",\n  \"trees_count\": 10,\n  \"status\": \"Verified\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plantations/update", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plantations","update"] }
+          }
+        },
+        {
+          "name": "Delete Plantation (Admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/plantation/plantations/delete", "host": ["{{BASE_URL}}"], "path": ["api","plantation","plantations","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Create Order",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"user_id\": \"64f1234abc5678def9012345\",\n  \"amount\": 1500,\n  \"trees_count\": 5,\n  \"occasion_id\": \"64f1234abc5678def9012347\",\n  \"species_id\": \"64f1234abc5678def9012348\",\n  \"site_id\": \"64f1234abc5678def9012349\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/", "host": ["{{BASE_URL}}"], "path": ["api","orders",""] }
+          }
+        },
+        {
+          "name": "My Orders (App)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/user/list", "host": ["{{BASE_URL}}"], "path": ["api","orders","user","list"] }
+          }
+        },
+        {
+          "name": "All Orders (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"order_status\": \"\",\n  \"search\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/list", "host": ["{{BASE_URL}}"], "path": ["api","orders","list"] }
+          }
+        },
+        {
+          "name": "Order Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/details", "host": ["{{BASE_URL}}"], "path": ["api","orders","details"] }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\",\n  \"order_status\": \"Assigned\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/status", "host": ["{{BASE_URL}}"], "path": ["api","orders","status"] }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/orders/delete", "host": ["{{BASE_URL}}"], "path": ["api","orders","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Payment",
+      "item": [
+        {
+          "name": "Initiate Payment",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\",\n  \"amount\": 1500,\n  \"mobile\": \"9876543210\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/payment/initiate", "host": ["{{BASE_URL}}"], "path": ["api","payment","initiate"] }
+          }
+        },
+        {
+          "name": "Payment Confirm (Webhook)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": { "mode": "raw", "raw": "{\n  \"transactionId\": \"TXN123456\",\n  \"merchantTransactionId\": \"MT123456\",\n  \"code\": \"PAYMENT_SUCCESS\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/payment/confirm", "host": ["{{BASE_URL}}"], "path": ["api","payment","confirm"] }
+          }
+        },
+        {
+          "name": "List All Payments (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10,\n  \"status\": \"\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/payment/list", "host": ["{{BASE_URL}}"], "path": ["api","payment","list"] }
+          }
+        },
+        {
+          "name": "Payment Revenue Stats",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{TOKEN}}" }],
+            "url": { "raw": "{{BASE_URL}}/api/payment/stats", "host": ["{{BASE_URL}}"], "path": ["api","payment","stats"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Certificate",
+      "item": [
+        {
+          "name": "List Certificates",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/certificate/list", "host": ["{{BASE_URL}}"], "path": ["api","certificate","list"] }
+          }
+        },
+        {
+          "name": "Certificate Details",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"certificate_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/certificate/details", "host": ["{{BASE_URL}}"], "path": ["api","certificate","details"] }
+          }
+        },
+        {
+          "name": "Generate Certificate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\",\n  \"template_id\": \"64f1234abc5678def9012346\",\n  \"recipient_name\": \"John Doe\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/certificate/generate", "host": ["{{BASE_URL}}"], "path": ["api","certificate","generate"] }
+          }
+        },
+        {
+          "name": "Download Certificate",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"certificate_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/certificate/download", "host": ["{{BASE_URL}}"], "path": ["api","certificate","download"] }
+          }
+        },
+        {
+          "name": "View Certificate (Public HTML)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{BASE_URL}}/api/certificate/view/64f1234abc5678def9012345", "host": ["{{BASE_URL}}"], "path": ["api","certificate","view","64f1234abc5678def9012345"] }
+          }
+        },
+        {
+          "name": "Delete Certificate",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"certificate_id\": \"64f1234abc5678def9012345\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/certificate/delete", "host": ["{{BASE_URL}}"], "path": ["api","certificate","delete"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Verification",
+      "item": [
+        {
+          "name": "Pending Verifications",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"page\": 1,\n  \"limit\": 10\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/verification/list", "host": ["{{BASE_URL}}"], "path": ["api","verification","list"] }
+          }
+        },
+        {
+          "name": "Verify Order",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"order_id\": \"64f1234abc5678def9012345\",\n  \"status\": \"Verified\",\n  \"remarks\": \"All documents verified\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/verification/verify", "host": ["{{BASE_URL}}"], "path": ["api","verification","verify"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Export Orders Report",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{TOKEN}}" }
+            ],
+            "body": { "mode": "raw", "raw": "{\n  \"format\": \"csv\",\n  \"from_date\": \"2025-01-01\",\n  \"to_date\": \"2025-03-31\",\n  \"order_status\": \"Completed\"\n}" },
+            "url": { "raw": "{{BASE_URL}}/api/reports/export", "host": ["{{BASE_URL}}"], "path": ["api","reports","export"] }
+          }
+        }
+      ]
+    }
+  ]
+}
