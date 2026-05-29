@@ -10,8 +10,8 @@ const router = express.Router();
 
 // State Routes
 // Get State API
-router.all('/list', decryptionMiddleware, authMiddleware, stateController.getStateList);
-router.all('/hierarchy', decryptionMiddleware, authMiddleware, stateController.getHierarchy);
+router.all('/list', decryptionMiddleware, stateController.getStateList);
+router.all('/hierarchy', decryptionMiddleware, stateController.getHierarchy);
 
 // Add State API
 router.post('/add', decryptionMiddleware, [

@@ -8,7 +8,7 @@ import { boundaryUpload, siteImageUpload } from '../middleware/upload.middleware
 const router = express.Router();
 
 // Public/Authenticated access
-router.all('/list', decryptionMiddleware, authMiddleware, siteController.getSiteList);
+router.all('/list', decryptionMiddleware, siteController.getSiteList);
 
 // Admin only access
 router.post('/add', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), siteImageUpload.single('site_image'), siteController.addSite);
@@ -19,7 +19,7 @@ router.delete('/delete', decryptionMiddleware, authMiddleware, roleMiddleware(['
 router.post('/upload-boundary', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), boundaryUpload.single('file'), siteController.uploadBoundaryFile);
 
 //
-router.all('/sitelist', decryptionMiddleware, authMiddleware, siteController.getSiteAllList);
+router.all('/sitelist', decryptionMiddleware, siteController.getSiteAllList);
 //
-router.all('/species-summary', decryptionMiddleware, authMiddleware, siteController.getAppSpeciesSummary);
+router.all('/species-summary', decryptionMiddleware, siteController.getAppSpeciesSummary);
 export default router;
