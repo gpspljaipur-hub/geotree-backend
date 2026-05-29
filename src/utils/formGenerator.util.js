@@ -9,26 +9,65 @@ import path from "path";
  * Species rows (plant_name, quantity, height, price) are always included as a dynamic block.
  */
 const PERMANENT_FIELDS = [
-  { key: 'name', label: 'Name', field_type: 'text', is_required: true, placeholder: 'Enter name' },
-  { key: 'date', label: 'Date', field_type: 'date', is_required: true, placeholder: '' },
-  { key: 'state_id', label: 'Select State', field_type: 'dropdown_api', is_required: false, placeholder: 'Choose State' },
-  { key: 'district', label: 'Select District', field_type: 'dropdown_api', is_required: false, placeholder: 'Choose District' },
-  { key: 'project_id', label: 'Select Project for Plantation', field_type: 'dropdown_api', is_required: false, placeholder: 'Choose Project' },
+  {
+    key: "name",
+    label: "Name",
+    field_type: "text",
+    is_required: true,
+    placeholder: "Enter name",
+  },
+  {
+    key: "date",
+    label: "Date",
+    field_type: "date",
+    is_required: true,
+    placeholder: "",
+  },
+  {
+    key: "state_id",
+    label: "Select State",
+    field_type: "dropdown_api",
+    is_required: false,
+    placeholder: "Choose State",
+  },
+  {
+    key: "district",
+    label: "Select District",
+    field_type: "dropdown_api",
+    is_required: false,
+    placeholder: "Choose District",
+  },
+  {
+    key: "project_id",
+    label: "Select Project for Plantation",
+    field_type: "dropdown_api",
+    is_required: false,
+    placeholder: "Choose Project",
+  },
 ];
 
 // Generates HTML for a single dynamic occasion-specific field
 function generateFieldHtml(field) {
-  const { label, key, field_type = 'text', is_required = false, placeholder = '', options = [] } = field;
-  const req = is_required ? 'required' : '';
-  const star = is_required ? '<span class="req-star">*</span>' : '';
+  const {
+    label,
+    key,
+    field_type = "text",
+    is_required = false,
+    placeholder = "",
+    options = [],
+  } = field;
+  const req = is_required ? "required" : "";
+  const star = is_required ? '<span class="req-star">*</span>' : "";
 
-  let inputHtml = '';
+  let inputHtml = "";
   switch (field_type) {
-    case 'textarea':
+    case "textarea":
       inputHtml = `<textarea id="${key}" name="${key}" placeholder="${placeholder}" ${req} rows="4"></textarea>`;
       break;
-    case 'dropdown': {
-      const opts = options.map(o => `<option value="${o}">${o}</option>`).join('\n          ');
+    case "dropdown": {
+      const opts = options
+        .map((o) => `<option value="${o}">${o}</option>`)
+        .join("\n          ");
       inputHtml = `<select id="${key}" name="${key}" ${req}>
           <option value="" disabled selected>${placeholder || `Select ${label}`}</option>
           ${opts}
@@ -56,25 +95,28 @@ function generateFieldHtml(field) {
  */
 export function generateOccasionFormHtml(occasion) {
   const { name, form_fields = [], permanent_field_overrides = {} } = occasion;
-  const occasionId = occasion._id?.toString() || '';
+  const occasionId = occasion._id?.toString() || "";
 
   // Apply admin overrides to permanent field required flags
   const pf = {};
-  PERMANENT_FIELDS.forEach(f => {
+  PERMANENT_FIELDS.forEach((f) => {
     pf[f.key] = {
       ...f,
-      is_required: permanent_field_overrides[f.key] !== undefined
-        ? permanent_field_overrides[f.key]
-        : f.is_required
+      is_required:
+        permanent_field_overrides[f.key] !== undefined
+          ? permanent_field_overrides[f.key]
+          : f.is_required,
     };
   });
 
-  const req = k => pf[k].is_required ? 'required' : '';
-  const star = k => pf[k].is_required ? '<span class="req-star">*</span>' : '';
+  const req = (k) => (pf[k].is_required ? "required" : "");
+  const star = (k) =>
+    pf[k].is_required ? '<span class="req-star">*</span>' : "";
 
-  const customFieldsHtml = form_fields.length > 0
-    ? form_fields.map(generateFieldHtml).join('\n      ')
-    : '<p class="no-extra">No additional fields for this occasion type.</p>';
+  const customFieldsHtml =
+    form_fields.length > 0
+      ? form_fields.map(generateFieldHtml).join("\n      ")
+      : '<p class="no-extra">No additional fields for this occasion type.</p>';
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -297,28 +339,28 @@ export function generateOccasionFormHtml(occasion) {
   <div class="section-label">Basic Information</div>
 
   <div class="form-group" data-key="name" data-permanent="true">
-    <label for="name">Name${star('name')}</label>
-    <input type="text" id="name" name="name" placeholder="Enter name" ${req('name')} />
+    <label for="name">Name${star("name")}</label>
+    <input type="text" id="name" name="name" placeholder="Enter name" ${req("name")} />
   </div>
 
   <div class="form-group" data-key="date" data-permanent="true">
-    <label for="date">Date${star('date')}</label>
-    <input type="date" id="date" name="date" ${req('date')} />
+    <label for="date">Date${star("date")}</label>
+    <input type="date" id="date" name="date" ${req("date")} />
   </div>
 
   <!-- ═══ PERMANENT: LOCATION ═══ -->
   <div class="section-label">Location</div>
 
   <div class="form-group" data-key="state_id" data-permanent="true">
-    <label for="state_id">Select State${star('state_id')}</label>
-    <select id="state_id" name="state_id" ${req('state_id')} onchange="onStateChange(this.value)">
+    <label for="state_id">Select State${star("state_id")}</label>
+    <select id="state_id" name="state_id" ${req("state_id")} onchange="onStateChange(this.value)">
       <option value="" disabled selected>Choose State</option>
     </select>
   </div>
 
   <div class="form-group" data-key="project_id" data-permanent="true">
-    <label for="project_id">Select Project for Plantation${star('project_id')}</label>
-    <select id="project_id" name="project_id" ${req('project_id')} onchange="onProjectChange(this.value)" disabled>
+    <label for="project_id">Select Project for Plantation${star("project_id")}</label>
+    <select id="project_id" name="project_id" ${req("project_id")} onchange="onProjectChange(this.value)" disabled>
       <option value="" disabled selected>Choose Project</option>
     </select>
   </div>
@@ -334,12 +376,16 @@ export function generateOccasionFormHtml(occasion) {
     <div id="sp-container"></div>
   </div>
 
-  ${form_fields.length > 0 ? `
+  ${
+    form_fields.length > 0
+      ? `
   <!-- ═══ OCCASION-SPECIFIC FIELDS ═══ -->
   <hr class="divider" />
   <div class="section-label">${name} Details</div>
   ${customFieldsHtml}
-  ` : '<p class="no-extra">No additional fields for this occasion.</p>'}
+  `
+      : '<p class="no-extra">No additional fields for this occasion.</p>'
+  }
 
   <div class="form-footer">
     <div id="form-error" class="error-msg">Please fill all required fields.</div>
@@ -772,20 +818,29 @@ export function generateOccasionFormHtml(occasion) {
 /**
  * Saves the generated HTML form to disk and returns the relative URL path.
  */
+// export function saveOccasionFormHtml(occasion) {
+//   const formsDir = path.join(process.cwd(), "public", "forms");
+//   if (!fs.existsSync(formsDir)) {
+//     fs.mkdirSync(formsDir, { recursive: true });
+//   }
+//   const filename = `occasion-${occasion._id}.html`;
+//   fs.writeFileSync(path.join(formsDir, filename), generateOccasionFormHtml(occasion), "utf-8");
+//   return `/forms/${filename}`;
+// }
+
 export function saveOccasionFormHtml(occasion) {
-  const formsDir = path.join(process.cwd(), "public", "forms");
-  if (!fs.existsSync(formsDir)) {
-    fs.mkdirSync(formsDir, { recursive: true });
-  }
-  const filename = `occasion-${occasion._id}.html`;
-  fs.writeFileSync(path.join(formsDir, filename), generateOccasionFormHtml(occasion), "utf-8");
-  return `/forms/${filename}`;
+  return `/forms/plantation_form.html?occasion_id=${occasion._id}`;
 }
 
 /**
  * Deletes the generated HTML form file for an occasion.
  */
 export function deleteOccasionFormHtml(occasionId) {
-  const filepath = path.join(process.cwd(), "public", "forms", `occasion-${occasionId}.html`);
+  const filepath = path.join(
+    process.cwd(),
+    "public",
+    "forms",
+    `occasion-${occasionId}.html`,
+  );
   if (fs.existsSync(filepath)) fs.unlinkSync(filepath);
 }
