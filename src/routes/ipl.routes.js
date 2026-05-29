@@ -74,7 +74,7 @@ router.delete('/teams/delete', decryptionMiddleware, authMiddleware, roleMiddlew
 router.all('/matches/list', decryptionMiddleware, authMiddleware, iplController.getAllMatches);
 
 // Add a new match
-router.post('/matches', decryptionMiddleware, [
+router.post('/matches', createUploadMiddleware('ipl').none(), decryptionMiddleware, [
     authMiddleware,
     roleMiddleware(['super_admin', 'admin']),
     audit('IPL', 'CREATE_MATCH'),

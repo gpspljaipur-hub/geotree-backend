@@ -13,12 +13,14 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.error("❌ CRITICAL: Razorpay keys are missing in environment variables! Razorpay payments will fail.");
+  console.error(
+    "❌ CRITICAL: Razorpay keys are missing in environment variables! Razorpay payments will fail.",
+  );
 }
 
 const razorpay = new Razorpay({
   key_id: RAZORPAY_KEY_ID || "rzp_test_placeholder",
-  key_secret: RAZORPAY_KEY_SECRET || "placeholder_secret"
+  key_secret: RAZORPAY_KEY_SECRET || "placeholder_secret",
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -29,10 +31,11 @@ const razorpay = new Razorpay({
 // SECURITY: Amount is always taken from DB record — never trusting client amount.
 // ─────────────────────────────────────────────────────────────────────────────
 export const createOrder = asyncHandler(async (req, res) => {
+  const razorpay = getRazorpayClient();
   const { amount: requestedAmount, order_id, plantation_id } = req.body;
 
-  const isAdmin = ['admin', 'super_admin'].includes(req.user?.role);
-  const user_id = (isAdmin && req.body.user_id) ? req.body.user_id : req.user?.id;
+  const isAdmin = ["admin", "super_admin"].includes(req.user?.role);
+  const user_id = isAdmin && req.body.user_id ? req.body.user_id : req.user?.id;
 
   let finalAmount = requestedAmount;
   let linkedPlantationId = plantation_id;
@@ -44,13 +47,14 @@ export const createOrder = asyncHandler(async (req, res) => {
     if (!orderRecord) throw new ApiError(404, "Order not found");
     finalAmount = orderRecord.amount;
     linkedOrderId = orderRecord._id;
-
   } else if (plantation_id) {
-    const plantationRecord = await Plantation.findById(plantation_id)
-      .select('amount payment_status');
-    if (!plantationRecord) throw new ApiError(404, "Plantation record not found");
+    const plantationRecord = await Plantation.findById(plantation_id).select(
+      "amount payment_status",
+    );
+    if (!plantationRecord)
+      throw new ApiError(404, "Plantation record not found");
     // Don't allow re-payment for already completed plantations
-    if (plantationRecord.payment_status === 'Completed') {
+    if (plantationRecord.payment_status === "Completed") {
       throw new ApiError(400, "Payment already completed for this plantation");
     }
 
@@ -66,26 +70,26 @@ export const createOrder = asyncHandler(async (req, res) => {
   const razorpayOrder = await razorpay.orders.create({
     amount: Math.round(Number(finalAmount) * 100), // Convert to paise (integer)
     currency: "INR",
-    receipt: `rcpt_${Date.now()}`
+    receipt: `rcpt_${Date.now()}`,
   });
-  console.log(`[Payment] Razorpay order created: }`,razorpayOrder.id);
+  console.log(`[Payment] Razorpay order created: }`, razorpayOrder.id);
 
   // ── Save pending Transaction locally ─────────────────────────────────────
   await Transaction.create({
     user_id,
     order_id: linkedOrderId || null,
     plantation_id: linkedPlantationId || null,
-    transaction_id: razorpayOrder.id,   // This is the Razorpay order_id
+    transaction_id: razorpayOrder.id, // This is the Razorpay order_id
     amount: Number(finalAmount),
-    currency: 'INR',
-    method: 'Razorpay',
-    status: 'Pending'
+    currency: "INR",
+    method: "Razorpay",
+    status: "Pending",
   });
 
   // ── Mark plantation as payment_status: 'Initiated' for tracking ──────────
   if (linkedPlantationId) {
     await Plantation.findByIdAndUpdate(linkedPlantationId, {
-      razorpay_order_id: razorpayOrder.id  // Save for webhook cross-check
+      razorpay_order_id: razorpayOrder.id, // Save for webhook cross-check
     });
   }
 
@@ -94,13 +98,13 @@ export const createOrder = asyncHandler(async (req, res) => {
     message: "Payment order created. Proceed to pay.",
     data: {
       razorpay_order_id: razorpayOrder.id,
-      razorpay_key_id: RAZORPAY_KEY_ID,       // Frontend needs this to launch SDK
-      amount: razorpayOrder.amount,             // Amount in paise
-      amount_inr: finalAmount,                  // Amount in rupees (for display)
+      razorpay_key_id: RAZORPAY_KEY_ID, // Frontend needs this to launch SDK
+      amount: razorpayOrder.amount, // Amount in paise
+      amount_inr: finalAmount, // Amount in rupees (for display)
       currency: razorpayOrder.currency,
       plantation_id: linkedPlantationId || null,
-      order_id: razorpayOrder.id || null
-    }
+      order_id: razorpayOrder.id || null,
+    },
   });
 });
 
@@ -119,35 +123,44 @@ export const createOrder = asyncHandler(async (req, res) => {
 //   6. Optionally update linked Order → Paid
 // ─────────────────────────────────────────────────────────────────────────────
 export const verifypayment = asyncHandler(async (req, res) => {
+  ensureRazorpaySecret();
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    let razorpay_order_id, razorpay_payment_id, expectedSignature, receivedSignature;
-    const isWebhook = !!req.headers['x-razorpay-signature'];
+    let razorpay_order_id,
+      razorpay_payment_id,
+      expectedSignature,
+      receivedSignature;
+    const isWebhook = !!req.headers["x-razorpay-signature"];
 
     if (isWebhook) {
       // ── WEBHOOK from Razorpay servers ────────────────────────────────────
-      const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
-      const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(req.body);
+      const webhookSecret =
+        process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
+      const rawBody = req.rawBody
+        ? req.rawBody.toString()
+        : JSON.stringify(req.body);
 
       expectedSignature = crypto
         .createHmac("sha256", webhookSecret)
         .update(rawBody)
         .digest("hex");
 
-      receivedSignature = req.headers['x-razorpay-signature'];
+      receivedSignature = req.headers["x-razorpay-signature"];
 
       const paymentEntity = req.body.payload?.payment?.entity;
       if (!paymentEntity) {
         await session.abortTransaction();
         session.endSession();
-        return res.json({ status: true, message: "Ignored: non-payment event" });
+        return res.json({
+          status: true,
+          message: "Ignored: non-payment event",
+        });
       }
 
       razorpay_order_id = paymentEntity.order_id;
       razorpay_payment_id = paymentEntity.id;
-
     } else {
       // ── Client-side confirmation from mobile/web app ──────────────────
       razorpay_order_id = req.body.razorpay_order_id;
@@ -157,7 +170,10 @@ export const verifypayment = asyncHandler(async (req, res) => {
       if (!razorpay_order_id || !razorpay_payment_id || !receivedSignature) {
         await session.abortTransaction();
         session.endSession();
-        throw new ApiError(400, "Missing required payment verification fields: razorpay_order_id, razorpay_payment_id, razorpay_signature");
+        throw new ApiError(
+          400,
+          "Missing required payment verification fields: razorpay_order_id, razorpay_payment_id, razorpay_signature",
+        );
       }
 
       const bodyData = razorpay_order_id + "|" + razorpay_payment_id;
@@ -172,15 +188,18 @@ export const verifypayment = asyncHandler(async (req, res) => {
       // Update transaction as failed
       await Transaction.findOneAndUpdate(
         { transaction_id: razorpay_order_id },
-        { status: 'Failed', gateway_response: req.body }
-      ).catch(e => console.error("Failed to mark transaction as failed:", e.message));
+        { status: "Failed", gateway_response: req.body },
+      ).catch((e) =>
+        console.error("Failed to mark transaction as failed:", e.message),
+      );
 
       await session.abortTransaction();
       session.endSession();
 
       return res.status(400).json({
         status: false,
-        message: "Payment verification failed: Invalid signature. Payment not accepted."
+        message:
+          "Payment verification failed: Invalid signature. Payment not accepted.",
       });
     }
 
@@ -188,22 +207,25 @@ export const verifypayment = asyncHandler(async (req, res) => {
     const txn = await Transaction.findOneAndUpdate(
       { transaction_id: razorpay_order_id },
       {
-        status: 'Completed',
+        status: "Completed",
         gateway_response: req.body,
-        razorpay_payment_id: razorpay_payment_id
+        razorpay_payment_id: razorpay_payment_id,
       },
-      { new: true, session }
+      { new: true, session },
     );
 
     if (!txn) {
-      console.warn(`[Payment] Transaction not found for Razorpay order: ${razorpay_order_id}`);
+      console.warn(
+        `[Payment] Transaction not found for Razorpay order: ${razorpay_order_id}`,
+      );
       await session.abortTransaction();
       session.endSession();
 
       return res.json({
         status: true,
-        message: "Payment received but transaction record not matched. Please contact support.",
-        razorpay_order_id
+        message:
+          "Payment received but transaction record not matched. Please contact support.",
+        razorpay_order_id,
       });
     }
 
@@ -213,15 +235,28 @@ export const verifypayment = asyncHandler(async (req, res) => {
     if (txn.plantation_id) {
       // link transaction to plantation and update status
       try {
-        const result = await completePlantationRecord(txn.plantation_id, razorpay_order_id, session);
+        const result = await completePlantationRecord(
+          txn.plantation_id,
+          razorpay_order_id,
+          session,
+        );
 
         if (result?.order?._id && !txn.order_id) {
           generatedOrderId = result.order._id;
-          await Transaction.findByIdAndUpdate(txn._id, { order_id: generatedOrderId }, { session });
+          await Transaction.findByIdAndUpdate(
+            txn._id,
+            { order_id: generatedOrderId },
+            { session },
+          );
         }
-        console.log(`[Payment] ✅ Plantation ${txn.plantation_id} marked as Completed`);
+        console.log(
+          `[Payment] ✅ Plantation ${txn.plantation_id} marked as Completed`,
+        );
       } catch (err) {
-        console.error(`[Verification] Error completing plantation record:`, err.message);
+        console.error(
+          `[Verification] Error completing plantation record:`,
+          err.message,
+        );
         // We continue because payment is confirmed anyway, but we log the error
       }
     }
@@ -230,10 +265,14 @@ export const verifypayment = asyncHandler(async (req, res) => {
     // NOTE: If txn.order_id was null, the order was just created by completePlantationRecord above.
     // If txn.order_id was already set (order-based payments), update it explicitly here.
     if (txn.order_id) {
-      await Order.findByIdAndUpdate(txn.order_id, {
-        payment_status: 'Paid',
-        order_status: 'Paid'
-      }, { session });
+      await Order.findByIdAndUpdate(
+        txn.order_id,
+        {
+          payment_status: "Paid",
+          order_status: "Paid",
+        },
+        { session },
+      );
     }
 
     await session.commitTransaction();
@@ -247,10 +286,9 @@ export const verifypayment = asyncHandler(async (req, res) => {
         order_id: generatedOrderId,
         razorpay_order_id,
         razorpay_payment_id,
-        amount_paid: txn.amount
-      }
+        amount_paid: txn.amount,
+      },
     });
-
   } catch (error) {
     if (session.inTransaction()) {
       await session.abortTransaction();
@@ -271,7 +309,9 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
   if (!plantation_id) throw new ApiError(400, "plantation_id is required");
 
   const plantation = await Plantation.findById(plantation_id)
-    .select('payment_status amount trees_count plantation_status planted_count transaction_id source')
+    .select(
+      "payment_status amount trees_count plantation_status planted_count transaction_id source",
+    )
     .lean();
 
   if (!plantation) throw new ApiError(404, "Plantation not found");
@@ -279,7 +319,7 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
   // Find most recent transaction for this plantation
   const txn = await Transaction.findOne({ plantation_id })
     .sort({ created_at: -1 })
-    .select('status transaction_id amount created_at')
+    .select("status transaction_id amount created_at")
     .lean();
 
   res.json({
@@ -295,13 +335,13 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
       source: plantation.source,
       transaction: txn
         ? {
-          razorpay_order_id: txn.transaction_id,
-          gateway_status: txn.status,
-          amount: txn.amount,
-          initiated_at: txn.created_at
-        }
-        : null
-    }
+            razorpay_order_id: txn.transaction_id,
+            gateway_status: txn.status,
+            amount: txn.amount,
+            initiated_at: txn.created_at,
+          }
+        : null,
+    },
   });
 });
 
@@ -314,67 +354,69 @@ export const getAllPayments = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
-    status,         // 'Pending' | 'Completed' | 'Failed'
-    user_id,        // filter by user
-    plantation_id,  // filter by plantation
-    from_date,      // date range start (ISO string)
-    to_date,        // date range end (ISO string)
-    transaction_id  // search by exact Razorpay order ID
+    status, // 'Pending' | 'Completed' | 'Failed'
+    user_id, // filter by user
+    plantation_id, // filter by plantation
+    from_date, // date range start (ISO string)
+    to_date, // date range end (ISO string)
+    transaction_id, // search by exact Razorpay order ID
   } = req.body;
 
   // ── Build Filter ──────────────────────────────────────────────────────────
   const filter = {};
-  if (status)         filter.status = status;
-  if (user_id)        filter.user_id = user_id;
-  if (plantation_id)  filter.plantation_id = plantation_id;
+  if (status) filter.status = status;
+  if (user_id) filter.user_id = user_id;
+  if (plantation_id) filter.plantation_id = plantation_id;
   if (transaction_id) filter.transaction_id = transaction_id;
 
   // Date range
   if (from_date || to_date) {
     filter.created_at = {};
     if (from_date) filter.created_at.$gte = new Date(from_date);
-    if (to_date)   filter.created_at.$lte = new Date(to_date);
+    if (to_date) filter.created_at.$lte = new Date(to_date);
   }
 
-  const pageNum  = Math.max(1, Number(page));
+  const pageNum = Math.max(1, Number(page));
   const limitNum = Math.min(100, Math.max(1, Number(limit)));
 
   const [payments, total] = await Promise.all([
     Transaction.find(filter)
-      .select('transaction_id razorpay_payment_id amount currency status method created_at user_id order_id plantation_id')
-      .populate('user_id', 'name email mobile')
-      .populate('order_id', 'order_status amount')
-      .populate('plantation_id', 'payment_status trees_count source amount')
+      .select(
+        "transaction_id razorpay_payment_id amount currency status method created_at user_id order_id plantation_id",
+      )
+      .populate("user_id", "name email mobile")
+      .populate("order_id", "order_status amount")
+      .populate("plantation_id", "payment_status trees_count source amount")
       .sort({ created_at: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum)
       .lean(),
-    Transaction.countDocuments(filter)
+    Transaction.countDocuments(filter),
   ]);
 
   // ── Flatten for admin table display ──────────────────────────────────────
-  const enriched = payments.map(txn => ({
-    _id:                   txn._id,
-    razorpay_order_id:     txn.transaction_id,
-    razorpay_payment_id:   txn.razorpay_payment_id || null, // BUG FIX: field now in schema
-    amount:                txn.amount,
-    currency:              txn.currency,
-    status:                txn.status,  // Pending | Completed | Failed
-    method:                txn.method,
-    created_at:            txn.created_at,
+  const enriched = payments.map((txn) => ({
+    _id: txn._id,
+    razorpay_order_id: txn.transaction_id,
+    razorpay_payment_id: txn.razorpay_payment_id || null, // BUG FIX: field now in schema
+    amount: txn.amount,
+    currency: txn.currency,
+    status: txn.status, // Pending | Completed | Failed
+    method: txn.method,
+    created_at: txn.created_at,
     // User
-    user_name:             txn.user_id?.name   || null,
-    user_mobile:           txn.user_id?.mobile || null,
-    user_email:            txn.user_id?.email  || null,
+    user_name: txn.user_id?.name || null,
+    user_mobile: txn.user_id?.mobile || null,
+    user_email: txn.user_id?.email || null,
     // Plantation
-    plantation_id:         txn.plantation_id?._id            || null,
-    plantation_source:     txn.plantation_id?.source         || null,
-    plantation_trees:      txn.plantation_id?.trees_count    || null,
-    plantation_amount:     txn.plantation_id?.amount         || null,
+    plantation_id: txn.plantation_id?._id || null,
+    plantation_source: txn.plantation_id?.source || null,
+    plantation_trees: txn.plantation_id?.trees_count || null,
+    plantation_amount: txn.plantation_id?.amount || null,
     plantation_pay_status: txn.plantation_id?.payment_status || null,
     // Order
-    order_id:              txn.order_id?._id          || null,
-    order_status:          txn.order_id?.order_status  || null,
+    order_id: txn.order_id?._id || null,
+    order_status: txn.order_id?.order_status || null,
   }));
 
   res.json({
@@ -385,8 +427,8 @@ export const getAllPayments = asyncHandler(async (req, res) => {
       total,
       page: pageNum,
       limit: limitNum,
-      pages: Math.ceil(total / limitNum)
-    }
+      pages: Math.ceil(total / limitNum),
+    },
   });
 });
 
@@ -400,14 +442,16 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
       $group: {
         _id: null,
         total_revenue: {
-          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, "$amount", 0] }
+          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, "$amount", 0] },
         },
-        completed: { $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] } },
+        completed: {
+          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] },
+        },
         failed: { $sum: { $cond: [{ $eq: ["$status", "Failed"] }, 1, 0] } },
         pending: { $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] } },
-        total_count: { $sum: 1 }
-      }
-    }
+        total_count: { $sum: 1 },
+      },
+    },
   ]);
 
   const result = stats[0] || {
@@ -415,7 +459,7 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
     completed: 0,
     failed: 0,
     pending: 0,
-    total_count: 0
+    total_count: 0,
   };
 
   res.json({
@@ -426,8 +470,8 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
       counts: {
         completed: result.completed,
         failed: result.failed,
-        pending: result.pending
-      }
-    }
+        pending: result.pending,
+      },
+    },
   });
 });
