@@ -1,0 +1,72 @@
+# Dependencies
+node_modules/
+.env
+.DS_Store
+logs/
+public/uploads/
+public/forms/
+
+# Environment variables
+.env
+.env.*
+!.env.example
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Public Uploads
+public/uploads/
+
+# OS Generated Files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Editors / IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+*.sublime-project
+*.sublime-workspace
+
+# Postman Collection
+GeoTree_API_Collection.postman_collection.json
+
+# API Testing & Documentation
+API_TESTING_GUIDE.md
+test-all-apis.js
+API_TEST_RESULTS.md
+BACKEND_FIX_SUMMARY.md
+BACKEND_UPLOAD_ISSUE_ANALYSIS.md
+PROFILE_UPDATE_FIX.md
+QUICK_FIX_REFERENCE.md
+SECURITY_AUDIT_REPORT.md
+SECURITY_FIXES_ACTION_PLAN.md
+SECURITY_SUMMARY.md
+PRODUCTION_QUICK_REFERENCE.md
+PRODUCTION_READINESS_ROADMAP.md 
+DATABASE_CONNECTION_TEST_RESULTS.md
+DB_CONNECTION_TEST_RESULTS.md
+DATABASE_CONNECTION_TEST_RESULTS.md
+test-team-support.js
+test-api-team-support.js
+SERVER_RESTART_REQUIRED.md
+TEAM_SUPPORT_TEST_RESULTS.md
+test-db-connection.js
+DATABASE_CONNECTION_TEST_RESULTS.md
+test-support-api.js
+DATABASE_CONNECTION_ANALYSIS.md
+GEOTREE_FULL_API_DOCUMENTATION.md
+public/uploads
+tests
+*docs

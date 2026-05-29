@@ -10,7 +10,8 @@ const router = express.Router();
 router.all('/list', decryptionMiddleware, authMiddleware, categoryController.getCategoryList);
 
 // Add a new category
-router.post('/add', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), categoryController.uploadCategoryImageMiddleware, categoryController.addCategory);
+// router.post('/add', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), categoryController.uploadCategoryImageMiddleware, categoryController.addCategory);
+router.post('/add', decryptionMiddleware, categoryController.uploadCategoryImageMiddleware, categoryController.addCategory);
 
 // Update an existing category
 router.put('/update', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), categoryController.uploadCategoryImageMiddleware, categoryController.updateCategory);

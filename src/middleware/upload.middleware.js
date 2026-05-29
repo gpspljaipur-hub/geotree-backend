@@ -40,11 +40,38 @@ export const createUploadMiddleware = (folderName = '') => {
         }
     };
 
-    return multer({
+    const multerInstance = multer({
         storage: storage,
         fileFilter: fileFilter,
         limits: { fileSize: 5 * 1024 * 1024 } // 5MB limit
     });
+
+    const originalSingle = multerInstance.single;
+    multerInstance.single = function (fieldname) {
+        if (fieldname === 'file') {
+            return originalSingle.call(this, fieldname);
+        }
+
+        const multerFields = multerInstance.fields([
+            { name: fieldname, maxCount: 1 },
+            { name: 'image', maxCount: 1 }
+        ]);
+
+        return (req, res, next) => {
+            multerFields(req, res, (err) => {
+                if (err) return next(err);
+                if (req.files) {
+                    const file = req.files[fieldname]?.[0] || req.files.image?.[0];
+                    if (file) {
+                        req.file = file;
+                    }
+                }
+                next();
+            });
+        };
+    };
+
+    return multerInstance;
 };
 
 // Default export uses the root uploads folder for backward compatibility

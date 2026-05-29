@@ -32,7 +32,23 @@ const upload = multer({
   }
 });
 
-export const uploadStateImageMiddleware = upload.single('state_image');
+const multerUpload = upload.fields([
+  { name: 'state_image', maxCount: 1 },
+  { name: 'image', maxCount: 1 }
+]);
+
+export const uploadStateImageMiddleware = (req, res, next) => {
+  multerUpload(req, res, (err) => {
+    if (err) return next(err);
+    if (req.files) {
+      const file = req.files.state_image?.[0] || req.files.image?.[0];
+      if (file) {
+        req.file = file;
+      }
+    }
+    next();
+  });
+};
 
 // @desc    Get state list
 export const getStateList = asyncHandler(async (req, res) => {

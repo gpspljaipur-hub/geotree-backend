@@ -17,7 +17,7 @@ const storage = multer.diskStorage({
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
     cb(null, `category-${uniqueSuffix}${path.extname(file.originalname)}`);
   }
-});
+})
 
 const upload = multer({
   storage: storage,
@@ -31,7 +31,23 @@ const upload = multer({
   }
 });
 
-export const uploadCategoryImageMiddleware = upload.single('category_image');
+const multerUpload = upload.fields([
+  { name: 'category_image', maxCount: 1 },
+  { name: 'image', maxCount: 1 }
+]);
+
+export const uploadCategoryImageMiddleware = (req, res, next) => {
+  multerUpload(req, res, (err) => {
+    if (err) return next(err);
+    if (req.files) {
+      const file = req.files.category_image?.[0] || req.files.image?.[0];
+      if (file) {
+        req.file = file;
+      }
+    }
+    next();
+  });
+};
 
 // @desc    Get category list
 export const getCategoryList = asyncHandler(async (req, res) => {

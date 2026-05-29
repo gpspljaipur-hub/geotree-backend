@@ -13,12 +13,12 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.error("❌ CRITICAL: Razorpay keys are missing in environment variables!");
+  console.error("❌ CRITICAL: Razorpay keys are missing in environment variables! Razorpay payments will fail.");
 }
 
 const razorpay = new Razorpay({
-  key_id: RAZORPAY_KEY_ID,
-  key_secret: RAZORPAY_KEY_SECRET
+  key_id: RAZORPAY_KEY_ID || "rzp_test_placeholder",
+  key_secret: RAZORPAY_KEY_SECRET || "placeholder_secret"
 });
 
 // ─────────────────────────────────────────────────────────────────────────────

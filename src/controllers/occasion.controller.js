@@ -43,7 +43,23 @@ const upload = multer({
 });
 
 // Multer middleware for occasion type image
-export const uploadOccasionImageMiddleware = upload.single("occasion_image");
+const multerUpload = upload.fields([
+  { name: 'occasion_image', maxCount: 1 },
+  { name: 'image', maxCount: 1 }
+]);
+
+export const uploadOccasionImageMiddleware = (req, res, next) => {
+  multerUpload(req, res, (err) => {
+    if (err) return next(err);
+    if (req.files) {
+      const file = req.files.occasion_image?.[0] || req.files.image?.[0];
+      if (file) {
+        req.file = file;
+      }
+    }
+    next();
+  });
+};
 
 // API 12: Get occasion type list
 export const getOccasionTypeList = asyncHandler(async (req, res) => {
