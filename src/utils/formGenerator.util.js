@@ -435,25 +435,55 @@ export function generateOccasionFormHtml(occasion) {
   }
 
   // ── Fetch metadata from API ──
-  async function fetchMetadata() {
-    if (!BASE_URL) {
-      console.warn("No valid BASE_URL – skipping API fetch (waiting for app to provide URL via setBaseUrl)");
-      return;
-    }
-    try {
-      const resp = await fetch(BASE_URL + "/api/occasion/list/" + OCCASION_ID);
-      const result = await resp.json();
-      if (result.status && result.data && result.data.metadata) {
-        const meta = result.data.metadata;
-        if (meta.states) window.setStates(meta.states);
-        if (meta.projects) window.setProjects(meta.projects);
-        if (meta.species) window.setSpecies(meta.species);
-        console.log("Metadata loaded from API");
+  // async function fetchMetadata() {
+  //   if (!BASE_URL) {
+  //     console.warn("No valid BASE_URL – skipping API fetch (waiting for app to provide URL via setBaseUrl)");
+  //     return;
+  //   }
+  //   try {
+  //     const resp = await fetch(BASE_URL + "/api/occasion/list/" + OCCASION_ID);
+  //     const result = await resp.json();
+  //     if (result.status && result.data && result.data.metadata) {
+  //       const meta = result.data.metadata;
+  //       if (meta.states) window.setStates(meta.states);
+  //       if (meta.projects) window.setProjects(meta.projects);
+  //       if (meta.species) window.setSpecies(meta.species);
+  //       console.log("Metadata loaded from API");
+  //     }
+  //   } catch (err) {
+  //     console.error("Failed to fetch metadata from API:", err);
+  //   }
+  // }
+console.log(BASE_URL,"BASE_URLBASE_URLBASE_URL)
+    async function fetchMetadata() {
+        if (!BASE_URL) {
+          console.warn("No valid BASE_URL");
+          return;
+        }
+
+        try {
+          const resp = await fetch(
+            BASE_URL + "/api/occasion/list/" + OCCASION_ID,
+          );
+          const result = await resp.json();
+
+          console.log("API Response =>", result); // 👈 Yaha lagao
+
+          if (result.status && result.data && result.data.metadata) {
+            const meta = result.data.metadata;
+
+            console.log("States =>", meta.states); // 👈 Yaha lagao
+            console.log("Projects =>", meta.projects);
+            console.log("Species =>", meta.species);
+
+            if (meta.states) window.setStates(meta.states);
+            if (meta.projects) window.setProjects(meta.projects);
+            if (meta.species) window.setSpecies(meta.species);
+          }
+        } catch (err) {
+          console.error("Failed to fetch metadata:", err);
+        }
       }
-    } catch (err) {
-      console.error("Failed to fetch metadata from API:", err);
-    }
-  }
 
   // ── Add a species row ──
   function addSpeciesRow() {
@@ -818,19 +848,27 @@ export function generateOccasionFormHtml(occasion) {
 /**
  * Saves the generated HTML form to disk and returns the relative URL path.
  */
-// export function saveOccasionFormHtml(occasion) {
-//   const formsDir = path.join(process.cwd(), "public", "forms");
-//   if (!fs.existsSync(formsDir)) {
-//     fs.mkdirSync(formsDir, { recursive: true });
-//   }
-//   const filename = `occasion-${occasion._id}.html`;
-//   fs.writeFileSync(path.join(formsDir, filename), generateOccasionFormHtml(occasion), "utf-8");
-//   return `/forms/${filename}`;
-// }
-
 export function saveOccasionFormHtml(occasion) {
-  return `/forms/plantation_form.html?occasion_id=${occasion._id}`;
+  const formsDir = path.join(process.cwd(), "public", "forms");
+  if (!fs.existsSync(formsDir)) {
+    fs.mkdirSync(formsDir, { recursive: true });
+  }
+  const filename = `occasion-${occasion._id}.html`;
+  fs.writeFileSync(
+    path.join(formsDir, filename),
+    generateOccasionFormHtml(occasion),
+    "utf-8",
+  );
+  return `/forms/${filename}`;
 }
+
+// export function saveOccasionFormHtml(occasion) {
+//   console.log(
+//     "NEW URL =>",
+//     `/forms/plantation_form.html?occasion_id=${occasion._id}`,
+//   );
+//   return `/forms/plantation_form.html?occasion_id=${occasion._id}`;
+// }
 
 /**
  * Deletes the generated HTML form file for an occasion.
