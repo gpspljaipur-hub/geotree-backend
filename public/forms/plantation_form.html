@@ -1,735 +1,766 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Plantation Details — GeoTree</title>
     <meta name="description" content="GeoTree Plantation submission form" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
     <style>
-        /* ─── RESET ─── */
-        *,
-        *::before,
-        *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            -webkit-text-size-adjust: 100%;
-        }
-
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #f4f7f4;
-            color: #1a2e1a;
-            min-height: 100vh;
-            padding-bottom: 32px;
-        }
-
-        /* ─── HEADER ─── */
-        .header {
-            background: linear-gradient(150deg, #1b5e20 0%, #2e7d32 50%, #43a047 100%);
-            padding: 22px 20px 18px;
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            box-shadow: 0 2px 12px rgba(30, 80, 30, .25);
-        }
-
-        .header-inner {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            max-width: 480px;
-            margin: 0 auto;
-        }
-
-        .back-btn {
-            background: rgba(255, 255, 255, .18);
-            border: none;
-            border-radius: 50%;
-            width: 36px;
-            height: 36px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #fff;
-            font-size: 1.1rem;
-            cursor: pointer;
-            flex-shrink: 0;
-            transition: background .2s;
-        }
-
-        .back-btn:active {
-            background: rgba(255, 255, 255, .35);
-        }
-
-        .header-text {
-            flex: 1;
-            text-align: center;
-        }
-
-        .header-text .logo-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-            margin-bottom: 2px;
-        }
-
-        .header-text .logo-icon {
-            font-size: 1.4rem;
-        }
-
-        .header-text .logo-name {
-            font-size: 1.1rem;
-            font-weight: 800;
-            color: #fff;
-            letter-spacing: .01em;
-        }
-
-        .header-text .logo-name span {
-            color: #a5d6a7;
-        }
-
-        .header-text .page-title {
-            font-size: .78rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, .8);
-            letter-spacing: .07em;
-            text-transform: uppercase;
-        }
-
-        /* ─── PROGRESS BAR ─── */
-        .progress-bar {
-            height: 3px;
-            background: rgba(255, 255, 255, .2);
-            max-width: 480px;
-            margin: 10px auto 0;
-            border-radius: 2px;
-            overflow: hidden;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: #a5d6a7;
-            border-radius: 2px;
-            width: 0%;
-            transition: width .4s ease;
-        }
-
-        /* ─── BODY WRAPPER ─── */
-        .form-body {
-            max-width: 480px;
-            margin: 0 auto;
-            padding: 20px 16px 0;
-        }
-
-        /* ─── SECTION LABELS ─── */
-        .section-label {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            font-size: .68rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .1em;
-            color: #2e7d32;
-            margin: 22px 0 11px;
-        }
-
-        .section-label::before {
-            content: '';
-            display: block;
-            width: 4px;
-            height: 14px;
-            background: linear-gradient(to bottom, #4caf50, #2e7d32);
-            border-radius: 2px;
-        }
-
-        .section-label:first-child {
-            margin-top: 4px;
-        }
-
-        /* ─── FORM GROUP ─── */
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            margin-bottom: 14px;
-            opacity: 0;
-            transform: translateY(7px);
-            animation: fadeUp .35s ease forwards;
-        }
-
-        .form-group label {
-            font-size: .84rem;
-            font-weight: 600;
-            color: #2d3748;
-        }
-
-        .req {
-            color: #e53e3e;
-            margin-left: 2px;
-        }
-
-        /* ─── INPUTS ─── */
-        .form-group input,
-        .form-group textarea {
-            width: 100%;
-            padding: .7rem 1rem;
-            font-size: .9rem;
-            font-family: 'Inter', sans-serif;
-            color: #1a2e1a;
-            background: #fff;
-            border: 1.5px solid #c8d5c8;
-            border-radius: 13px;
-            outline: none;
-            transition: border-color .2s, box-shadow .2s, background-color .2s;
-            appearance: none;
-            -webkit-appearance: none;
-        }
-
-        /* SELECT — native dropdown kept, custom arrow via wrapper */
-        .select-wrap {
-            position: relative;
-        }
-
-        .select-wrap::after {
-            content: '';
-            position: absolute;
-            right: .9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 0;
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-            border-top: 6px solid #4caf50;
-            pointer-events: none;
-        }
-
-        .select-wrap select {
-            width: 100%;
-            padding: .7rem 2.4rem .7rem 1rem;
-            font-size: .9rem;
-            font-family: 'Inter', sans-serif;
-            color: #1a2e1a;
-            background-color: #fff;
-            border: 1.5px solid #c8d5c8;
-            border-radius: 13px;
-            outline: none;
-            cursor: pointer;
-            transition: border-color .2s, box-shadow .2s, background-color .2s;
-        }
-
-        .select-wrap select:focus {
-            border-color: #4caf50;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, .14);
-        }
-
-        .select-wrap select:disabled {
-            background-color: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        .select-wrap.disabled-wrap::after {
-            border-top-color: #9ca3af;
-        }
-
-        .form-group input:focus,
-        .form-group textarea:focus {
-            border-color: #4caf50;
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(76, 175, 80, .14);
-        }
-
-        .form-group input::placeholder,
-        .form-group textarea::placeholder {
-            color: #9ca3af;
-        }
-
-        .form-group input:disabled {
-            background-color: #f3f4f6;
-            color: #9ca3af;
-            cursor: not-allowed;
-        }
-
-        /* Date input calendar icon */
-        .date-wrapper {
-            position: relative;
-        }
-
-        .date-wrapper input[type="date"] {
-            padding-right: 2.8rem;
-            cursor: pointer;
-        }
-
-        .date-icon {
-            position: absolute;
-            right: .9rem;
-            top: 50%;
-            transform: translateY(-50%);
-            pointer-events: none;
-            font-size: 1.1rem;
-            color: #4caf50;
-        }
-
-        /* Textarea */
-        .form-group textarea {
-            resize: vertical;
-            min-height: 85px;
-            line-height: 1.5;
-        }
-
-        /* Two-col row */
-        .row2 {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 11px;
-        }
-
-
-        /* ─── SPECIES BLOCK ─── */
-        .species-block {
-            background: #e8f5e9;
-            border: 1.5px solid #a5d6a7;
-            border-radius: 15px;
-            padding: 14px;
-            margin-bottom: 8px;
-        }
-
-        .species-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-
-        .species-header .sp-title {
-            font-size: .82rem;
-            font-weight: 700;
-            color: #1b5e20;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .btn-add-species {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            background: #4caf50;
-            color: #fff;
-            border: none;
-            border-radius: 9px;
-            padding: 6px 12px;
-            font-size: .76rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: background .2s, transform .15s;
-        }
-
-        .btn-add-species:active {
-            background: #388e3c;
-            transform: scale(.97);
-        }
-
-        .sp-row {
-            background: #fff;
-            border: 1.5px solid #c8d5c8;
-            border-radius: 11px;
-            padding: 12px;
-            margin-bottom: 9px;
-            animation: fadeUp .3s ease forwards;
-            opacity: 0;
-            transform: translateY(5px);
-        }
-
-        .sp-row .sp-plant {
-            margin-bottom: 8px;
-        }
-
-        .sp-row .sp-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 8px;
-        }
-
-        .sp-row .form-group {
-            margin-bottom: 0;
-            opacity: 1;
-            transform: none;
-            animation: none;
-        }
-
-        .sp-row .form-group label {
-            font-size: .76rem;
-        }
-
-        .sp-row .form-group input,
-        .sp-row .select-wrap select {
-            padding: .52rem .75rem;
-            font-size: .82rem;
-            border-radius: 9px;
-        }
-
-        .sp-row .select-wrap {
-            display: block;
-        }
-
-        .sp-row-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 9px;
-        }
-
-        .sp-summary {
-            font-size: .72rem;
-            color: #4a5568;
-        }
-
-        .sp-summary span {
-            font-weight: 700;
-            color: #2e7d32;
-        }
-
-        .btn-remove-sp {
-            background: none;
-            border: none;
-            color: #e53e3e;
-            font-size: .74rem;
-            font-weight: 600;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 3px;
-        }
-
-        /* ─── ORDER SUMMARY CARD ─── */
-        .summary-card {
-            background: linear-gradient(135deg, #1b5e20, #2e7d32);
-            color: #fff;
-            border-radius: 15px;
-            padding: 16px 18px;
-            margin-bottom: 14px;
-            display: none;
-        }
-
-        .summary-card.visible {
-            display: block;
-        }
-
-        .summary-card .sm-title {
-            font-size: .72rem;
-            font-weight: 700;
-            opacity: .75;
-            text-transform: uppercase;
-            letter-spacing: .08em;
-            margin-bottom: 10px;
-        }
-
-        .summary-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .sm-item .sm-val {
-            font-size: 1.3rem;
-            font-weight: 800;
-        }
-
-        .sm-item .sm-lbl {
-            font-size: .68rem;
-            opacity: .75;
-            margin-top: 2px;
-        }
-
-        /* ─── SUBMIT BUTTON ─── */
-        .submit-btn {
-            width: 100%;
-            background: linear-gradient(135deg, #2e7d32, #4caf50);
-            color: #fff;
-            border: none;
-            border-radius: 14px;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 22px;
-            letter-spacing: .02em;
-            transition: opacity .2s, transform .15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-
-        .submit-btn:active {
-            opacity: .88;
-            transform: scale(.98);
-        }
-
-        .submit-btn:disabled {
-            opacity: .5;
-            cursor: not-allowed;
-        }
-
-        /* ─── LOADING STATE ─── */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(27, 94, 32, .85);
-            z-index: 999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
-            color: #fff;
-        }
-
-        .loading-overlay.visible {
-            display: flex;
-        }
-
-        .spinner {
-            width: 44px;
-            height: 44px;
-            border: 4px solid rgba(255, 255, 255, .25);
-            border-top-color: #fff;
-            border-radius: 50%;
-            animation: spin .8s linear infinite;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* ─── SUCCESS OVERLAY ─── */
-        .success-overlay {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(160deg, #1b5e20 0%, #2e7d32 40%, #43a047 100%);
-            z-index: 1000;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 32px 24px;
-            color: #fff;
-            text-align: center;
-        }
-
-        .success-overlay.visible {
-            display: flex;
-        }
-
-        .success-icon {
-            font-size: 4rem;
-            margin-bottom: 12px;
-            animation: successBounce .6s ease;
-        }
-
-        @keyframes successBounce {
-            0% {
-                transform: scale(0);
-                opacity: 0;
-            }
-
-            50% {
-                transform: scale(1.2);
-            }
-
-            100% {
-                transform: scale(1);
-                opacity: 1;
-            }
-        }
-
-        .success-title {
-            font-size: 1.4rem;
-            font-weight: 800;
-            margin-bottom: 6px;
-            letter-spacing: .01em;
-        }
-
-        .success-subtitle {
-            font-size: .88rem;
-            opacity: .85;
-            margin-bottom: 24px;
-            line-height: 1.5;
-        }
-
-        .success-summary {
-            background: rgba(255, 255, 255, .12);
-            backdrop-filter: blur(8px);
-            border-radius: 16px;
-            padding: 18px 24px;
-            width: 100%;
-            max-width: 340px;
-            margin-bottom: 28px;
-            border: 1px solid rgba(255, 255, 255, .15);
-        }
-
-        .success-summary .ss-title {
-            font-size: .7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: .1em;
-            opacity: .7;
-            margin-bottom: 14px;
-        }
-
-        .success-summary .ss-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr 1fr;
-            gap: 10px;
-            text-align: center;
-        }
-
-        .success-summary .ss-val {
-            font-size: 1.5rem;
-            font-weight: 800;
-        }
-
-        .success-summary .ss-lbl {
-            font-size: .68rem;
-            opacity: .75;
-            margin-top: 3px;
-        }
-
-        .btn-continue {
-            width: 100%;
-            max-width: 340px;
-            background: #fff;
-            color: #1b5e20;
-            border: none;
-            border-radius: 14px;
-            padding: 1rem;
-            font-size: 1rem;
-            font-weight: 700;
-            cursor: pointer;
-            letter-spacing: .02em;
-            transition: opacity .2s, transform .15s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .15);
-        }
-
-        .btn-continue:active {
-            opacity: .88;
-            transform: scale(.97);
-        }
-
-        /* ─── TOAST ─── */
-        .toast {
-            position: fixed;
-            bottom: 28px;
-            left: 50%;
-            transform: translateX(-50%) translateY(80px);
-            background: #1b5e20;
-            color: #fff;
-            padding: 12px 22px;
-            border-radius: 30px;
-            font-size: .85rem;
-            font-weight: 600;
-            white-space: nowrap;
-            z-index: 998;
-            transition: transform .35s cubic-bezier(.34, 1.56, .64, 1);
-            box-shadow: 0 4px 20px rgba(0, 0, 0, .25);
-        }
-
-        .toast.error-toast {
-            background: #c62828;
-        }
-
-        .toast.show {
-            transform: translateX(-50%) translateY(0);
-        }
-
-        /* ─── ANIMATE ─── */
-        @keyframes fadeUp {
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        /* Stagger animation delays */
-        .form-group:nth-child(1) {
-            animation-delay: .04s;
-        }
-
-        .form-group:nth-child(2) {
-            animation-delay: .08s;
-        }
-
-        .form-group:nth-child(3) {
-            animation-delay: .12s;
-        }
-
-        .form-group:nth-child(4) {
-            animation-delay: .16s;
-        }
-
-        .form-group:nth-child(5) {
-            animation-delay: .20s;
-        }
-
-        .form-group:nth-child(6) {
-            animation-delay: .24s;
-        }
+      /* ─── RESET ─── */
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      html {
+        -webkit-text-size-adjust: 100%;
+      }
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: #f4f7f4;
+        color: #1a2e1a;
+        min-height: 100vh;
+        padding-bottom: 32px;
+      }
+
+      /* ─── HEADER ─── */
+      .header {
+        background: linear-gradient(
+          150deg,
+          #1b5e20 0%,
+          #2e7d32 50%,
+          #43a047 100%
+        );
+        padding: 22px 20px 18px;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 2px 12px rgba(30, 80, 30, 0.25);
+      }
+
+      .header-inner {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .back-btn {
+        background: rgba(255, 255, 255, 0.18);
+        border: none;
+        border-radius: 50%;
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-size: 1.1rem;
+        cursor: pointer;
+        flex-shrink: 0;
+        transition: background 0.2s;
+      }
+
+      .back-btn:active {
+        background: rgba(255, 255, 255, 0.35);
+      }
+
+      .header-text {
+        flex: 1;
+        text-align: center;
+      }
+
+      .header-text .logo-row {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        margin-bottom: 2px;
+      }
+
+      .header-text .logo-icon {
+        font-size: 1.4rem;
+      }
+
+      .header-text .logo-name {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #fff;
+        letter-spacing: 0.01em;
+      }
+
+      .header-text .logo-name span {
+        color: #a5d6a7;
+      }
+
+      .header-text .page-title {
+        font-size: 0.78rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+        letter-spacing: 0.07em;
+        text-transform: uppercase;
+      }
+
+      /* ─── PROGRESS BAR ─── */
+      .progress-bar {
+        height: 3px;
+        background: rgba(255, 255, 255, 0.2);
+        max-width: 480px;
+        margin: 10px auto 0;
+        border-radius: 2px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: #a5d6a7;
+        border-radius: 2px;
+        width: 0%;
+        transition: width 0.4s ease;
+      }
+
+      /* ─── BODY WRAPPER ─── */
+      .form-body {
+        max-width: 480px;
+        margin: 0 auto;
+        padding: 20px 16px 0;
+      }
+
+      /* ─── SECTION LABELS ─── */
+      .section-label {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.68rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #2e7d32;
+        margin: 22px 0 11px;
+      }
+
+      .section-label::before {
+        content: "";
+        display: block;
+        width: 4px;
+        height: 14px;
+        background: linear-gradient(to bottom, #4caf50, #2e7d32);
+        border-radius: 2px;
+      }
+
+      .section-label:first-child {
+        margin-top: 4px;
+      }
+
+      /* ─── FORM GROUP ─── */
+      .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-bottom: 14px;
+        opacity: 0;
+        transform: translateY(7px);
+        animation: fadeUp 0.35s ease forwards;
+      }
+
+      .form-group label {
+        font-size: 0.84rem;
+        font-weight: 600;
+        color: #2d3748;
+      }
+
+      .req {
+        color: #e53e3e;
+        margin-left: 2px;
+      }
+
+      /* ─── INPUTS ─── */
+      .form-group input,
+      .form-group textarea {
+        width: 100%;
+        padding: 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-family: "Inter", sans-serif;
+        color: #1a2e1a;
+        background: #fff;
+        border: 1.5px solid #c8d5c8;
+        border-radius: 13px;
+        outline: none;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          background-color 0.2s;
+        appearance: none;
+        -webkit-appearance: none;
+      }
+
+      /* SELECT — native dropdown kept, custom arrow via wrapper */
+      .select-wrap {
+        position: relative;
+      }
+
+      .select-wrap::after {
+        content: "";
+        position: absolute;
+        right: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 0;
+        height: 0;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid #4caf50;
+        pointer-events: none;
+      }
+
+      .select-wrap select {
+        width: 100%;
+        padding: 0.7rem 2.4rem 0.7rem 1rem;
+        font-size: 0.9rem;
+        font-family: "Inter", sans-serif;
+        color: #1a2e1a;
+        background-color: #fff;
+        border: 1.5px solid #c8d5c8;
+        border-radius: 13px;
+        outline: none;
+        cursor: pointer;
+        transition:
+          border-color 0.2s,
+          box-shadow 0.2s,
+          background-color 0.2s;
+      }
+
+      .select-wrap select:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.14);
+      }
+
+      .select-wrap select:disabled {
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      .select-wrap.disabled-wrap::after {
+        border-top-color: #9ca3af;
+      }
+
+      .form-group input:focus,
+      .form-group textarea:focus {
+        border-color: #4caf50;
+        background-color: #fff;
+        box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.14);
+      }
+
+      .form-group input::placeholder,
+      .form-group textarea::placeholder {
+        color: #9ca3af;
+      }
+
+      .form-group input:disabled {
+        background-color: #f3f4f6;
+        color: #9ca3af;
+        cursor: not-allowed;
+      }
+
+      /* Date input calendar icon */
+      .date-wrapper {
+        position: relative;
+      }
+
+      .date-wrapper input[type="date"] {
+        padding-right: 2.8rem;
+        cursor: pointer;
+      }
+
+      .date-icon {
+        position: absolute;
+        right: 0.9rem;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        font-size: 1.1rem;
+        color: #4caf50;
+      }
+
+      /* Textarea */
+      .form-group textarea {
+        resize: vertical;
+        min-height: 85px;
+        line-height: 1.5;
+      }
+
+      /* Two-col row */
+      .row2 {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 11px;
+      }
+
+      /* ─── SPECIES BLOCK ─── */
+      .species-block {
+        background: #e8f5e9;
+        border: 1.5px solid #a5d6a7;
+        border-radius: 15px;
+        padding: 14px;
+        margin-bottom: 8px;
+      }
+
+      .species-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+      }
+
+      .species-header .sp-title {
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #1b5e20;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .btn-add-species {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+        background: #4caf50;
+        color: #fff;
+        border: none;
+        border-radius: 9px;
+        padding: 6px 12px;
+        font-size: 0.76rem;
+        font-weight: 700;
+        cursor: pointer;
+        transition:
+          background 0.2s,
+          transform 0.15s;
+      }
+
+      .btn-add-species:active {
+        background: #388e3c;
+        transform: scale(0.97);
+      }
+
+      .sp-row {
+        background: #fff;
+        border: 1.5px solid #c8d5c8;
+        border-radius: 11px;
+        padding: 12px;
+        margin-bottom: 9px;
+        animation: fadeUp 0.3s ease forwards;
+        opacity: 0;
+        transform: translateY(5px);
+      }
+
+      .sp-row .sp-plant {
+        margin-bottom: 8px;
+      }
+
+      .sp-row .sp-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 8px;
+      }
+
+      .sp-row .form-group {
+        margin-bottom: 0;
+        opacity: 1;
+        transform: none;
+        animation: none;
+      }
+
+      .sp-row .form-group label {
+        font-size: 0.76rem;
+      }
+
+      .sp-row .form-group input,
+      .sp-row .select-wrap select {
+        padding: 0.52rem 0.75rem;
+        font-size: 0.82rem;
+        border-radius: 9px;
+      }
+
+      .sp-row .select-wrap {
+        display: block;
+      }
+
+      .sp-row-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 9px;
+      }
+
+      .sp-summary {
+        font-size: 0.72rem;
+        color: #4a5568;
+      }
+
+      .sp-summary span {
+        font-weight: 700;
+        color: #2e7d32;
+      }
+
+      .btn-remove-sp {
+        background: none;
+        border: none;
+        color: #e53e3e;
+        font-size: 0.74rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 3px;
+      }
+
+      /* ─── ORDER SUMMARY CARD ─── */
+      .summary-card {
+        background: linear-gradient(135deg, #1b5e20, #2e7d32);
+        color: #fff;
+        border-radius: 15px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        display: none;
+      }
+
+      .summary-card.visible {
+        display: block;
+      }
+
+      .summary-card .sm-title {
+        font-size: 0.72rem;
+        font-weight: 700;
+        opacity: 0.75;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        margin-bottom: 10px;
+      }
+
+      .summary-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .sm-item .sm-val {
+        font-size: 1.3rem;
+        font-weight: 800;
+      }
+
+      .sm-item .sm-lbl {
+        font-size: 0.68rem;
+        opacity: 0.75;
+        margin-top: 2px;
+      }
+
+      /* ─── SUBMIT BUTTON ─── */
+      .submit-btn {
+        width: 100%;
+        background: linear-gradient(135deg, #2e7d32, #4caf50);
+        color: #fff;
+        border: none;
+        border-radius: 14px;
+        padding: 1rem;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        margin-top: 22px;
+        letter-spacing: 0.02em;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+      }
+
+      .submit-btn:active {
+        opacity: 0.88;
+        transform: scale(0.98);
+      }
+
+      .submit-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+      }
+
+      /* ─── LOADING STATE ─── */
+      .loading-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: rgba(27, 94, 32, 0.85);
+        z-index: 999;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+        color: #fff;
+      }
+
+      .loading-overlay.visible {
+        display: flex;
+      }
+
+      .spinner {
+        width: 44px;
+        height: 44px;
+        border: 4px solid rgba(255, 255, 255, 0.25);
+        border-top-color: #fff;
+        border-radius: 50%;
+        animation: spin 0.8s linear infinite;
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ─── SUCCESS OVERLAY ─── */
+      .success-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: linear-gradient(
+          160deg,
+          #1b5e20 0%,
+          #2e7d32 40%,
+          #43a047 100%
+        );
+        z-index: 1000;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 24px;
+        color: #fff;
+        text-align: center;
+      }
+
+      .success-overlay.visible {
+        display: flex;
+      }
+
+      .success-icon {
+        font-size: 4rem;
+        margin-bottom: 12px;
+        animation: successBounce 0.6s ease;
+      }
+
+      @keyframes successBounce {
+        0% {
+          transform: scale(0);
+          opacity: 0;
+        }
+
+        50% {
+          transform: scale(1.2);
+        }
+
+        100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+      }
+
+      .success-title {
+        font-size: 1.4rem;
+        font-weight: 800;
+        margin-bottom: 6px;
+        letter-spacing: 0.01em;
+      }
+
+      .success-subtitle {
+        font-size: 0.88rem;
+        opacity: 0.85;
+        margin-bottom: 24px;
+        line-height: 1.5;
+      }
+
+      .success-summary {
+        background: rgba(255, 255, 255, 0.12);
+        backdrop-filter: blur(8px);
+        border-radius: 16px;
+        padding: 18px 24px;
+        width: 100%;
+        max-width: 340px;
+        margin-bottom: 28px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+      }
+
+      .success-summary .ss-title {
+        font-size: 0.7rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        opacity: 0.7;
+        margin-bottom: 14px;
+      }
+
+      .success-summary .ss-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr;
+        gap: 10px;
+        text-align: center;
+      }
+
+      .success-summary .ss-val {
+        font-size: 1.5rem;
+        font-weight: 800;
+      }
+
+      .success-summary .ss-lbl {
+        font-size: 0.68rem;
+        opacity: 0.75;
+        margin-top: 3px;
+      }
+
+      .btn-continue {
+        width: 100%;
+        max-width: 340px;
+        background: #fff;
+        color: #1b5e20;
+        border: none;
+        border-radius: 14px;
+        padding: 1rem;
+        font-size: 1rem;
+        font-weight: 700;
+        cursor: pointer;
+        letter-spacing: 0.02em;
+        transition:
+          opacity 0.2s,
+          transform 0.15s;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      }
+
+      .btn-continue:active {
+        opacity: 0.88;
+        transform: scale(0.97);
+      }
+
+      /* ─── TOAST ─── */
+      .toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(80px);
+        background: #1b5e20;
+        color: #fff;
+        padding: 12px 22px;
+        border-radius: 30px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        white-space: nowrap;
+        z-index: 998;
+        transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      }
+
+      .toast.error-toast {
+        background: #c62828;
+      }
+
+      .toast.show {
+        transform: translateX(-50%) translateY(0);
+      }
+
+      /* ─── ANIMATE ─── */
+      @keyframes fadeUp {
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Stagger animation delays */
+      .form-group:nth-child(1) {
+        animation-delay: 0.04s;
+      }
+
+      .form-group:nth-child(2) {
+        animation-delay: 0.08s;
+      }
+
+      .form-group:nth-child(3) {
+        animation-delay: 0.12s;
+      }
+
+      .form-group:nth-child(4) {
+        animation-delay: 0.16s;
+      }
+
+      .form-group:nth-child(5) {
+        animation-delay: 0.2s;
+      }
+
+      .form-group:nth-child(6) {
+        animation-delay: 0.24s;
+      }
     </style>
-</head>
+  </head>
 
-<body>
-
+  <body>
     <!-- LOADING OVERLAY -->
     <div class="loading-overlay" id="loadingOverlay">
-        <div class="spinner"></div>
-        <div>Submitting plantation…</div>
+      <div class="spinner"></div>
+      <div>Submitting plantation…</div>
     </div>
 
     <!-- SUCCESS OVERLAY -->
     <div class="success-overlay" id="successOverlay">
-        <div class="success-icon">🎉</div>
-        <div class="success-title">Plantation Submitted!</div>
-        <div class="success-subtitle">Your trees are being planted. Thank you for making the earth greener!</div>
-        <div class="success-summary">
-            <div class="ss-title">Plantation Summary</div>
-            <div class="ss-grid">
-                <div>
-                    <div class="ss-val" id="ss-trees">0</div>
-                    <div class="ss-lbl">Trees</div>
-                </div>
-                <div>
-                    <div class="ss-val" id="ss-amount">₹0</div>
-                    <div class="ss-lbl">Amount</div>
-                </div>
-                <div>
-                    <div class="ss-val" id="ss-co2">0 kg</div>
-                    <div class="ss-lbl">CO₂ Offset</div>
-                </div>
-            </div>
+      <div class="success-icon">🎉</div>
+      <div class="success-title">Plantation Submitted!</div>
+      <div class="success-subtitle">
+        Your trees are being planted. Thank you for making the earth greener!
+      </div>
+      <div class="success-summary">
+        <div class="ss-title">Plantation Summary</div>
+        <div class="ss-grid">
+          <div>
+            <div class="ss-val" id="ss-trees">0</div>
+            <div class="ss-lbl">Trees</div>
+          </div>
+          <div>
+            <div class="ss-val" id="ss-amount">₹0</div>
+            <div class="ss-lbl">Amount</div>
+          </div>
+          <div>
+            <div class="ss-val" id="ss-co2">0 kg</div>
+            <div class="ss-lbl">CO₂ Offset</div>
+          </div>
         </div>
-        <button type="button" class="btn-continue" id="continueBtn" onclick="continueToNext()">
-            Continue →
-        </button>
+      </div>
+      <button
+        type="button"
+        class="btn-continue"
+        id="continueBtn"
+        onclick="continueToNext()"
+      >
+        Continue →
+      </button>
     </div>
 
     <!-- TOAST -->
@@ -737,357 +768,534 @@
 
     <!-- ═══ HEADER ═══ -->
     <div class="header">
-        <div class="header-inner">
-            <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
-            <div class="header-text">
-                <div class="logo-row">
-                    <span class="logo-icon">🌱</span>
-                    <span class="logo-name">Geo<span>Tree</span></span>
-                </div>
-                <div class="page-title">Plantation Details</div>
-            </div>
-            <div style="width:36px"></div><!-- spacer -->
+      <div class="header-inner">
+        <button class="back-btn" id="backBtn" onclick="goBack()">←</button>
+        <div class="header-text">
+          <div class="logo-row">
+            <span class="logo-icon">🌱</span>
+            <span class="logo-name">Geo<span>Tree</span></span>
+          </div>
+          <div class="page-title">Plantation Details</div>
         </div>
-        <div class="progress-bar" id="progressBar" style="display:none">
-            <div class="progress-fill" id="progressFill"></div>
-        </div>
+        <div style="width: 36px"></div>
+        <!-- spacer -->
+      </div>
+      <div class="progress-bar" id="progressBar" style="display: none">
+        <div class="progress-fill" id="progressFill"></div>
+      </div>
     </div>
 
     <!-- ═══ FORM ═══ -->
     <div class="form-body">
-        <form id="plantationForm" autocomplete="off" novalidate>
+      <form id="plantationForm" autocomplete="off" novalidate>
+        <!-- ─── SECTION: BASIC INFO ─── -->
+        <div class="section-label">Basic Information</div>
 
-            <!-- ─── SECTION: BASIC INFO ─── -->
-            <div class="section-label">Basic Information</div>
-
-            <div class="row2">
-                <div class="form-group">
-                    <label for="name">Name <span class="req">*</span></label>
-                    <input type="text" id="name" name="name" placeholder="Enter name" required />
-                </div>
-                <div class="form-group">
-                    <label for="date">Date <span class="req">*</span></label>
-                    <div class="date-wrapper">
-                        <input type="date" id="date" name="date" required />
-                        <span class="date-icon">📅</span>
-                    </div>
-                </div>
+        <div class="row2">
+          <div class="form-group">
+            <label for="name">Name <span class="req">*</span></label>
+            <input
+              type="text"
+              id="name"
+              name="name"
+              placeholder="Enter name"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="date">Date <span class="req">*</span></label>
+            <div class="date-wrapper">
+              <input type="date" id="date" name="date" required />
+              <span class="date-icon">📅</span>
             </div>
+          </div>
+        </div>
 
-            <!-- hidden: occasion_id set externally by the app -->
-            <input type="hidden" id="occasion_id" name="occasion_id" />
+        <!-- hidden: occasion_id set externally by the app -->
+        <input type="hidden" id="occasion_id" name="occasion_id" />
 
-            <!-- Occasion-specific dynamic fields rendered here by window.setOccasion() -->
-            <div id="occasionFields"></div>
+        <!-- Occasion-specific dynamic fields rendered here by window.setOccasion() -->
+        <div id="occasionFields"></div>
 
-            <!-- ─── SECTION: LOCATION ─── -->
-            <div class="section-label">Location</div>
+        <!-- ─── SECTION: LOCATION ─── -->
+        <div class="section-label">Location</div>
 
-            <div class="form-group">
-                <label for="state_id">Select State</label>
-                <div class="select-wrap" id="state-wrap">
-                    <select id="state_id" name="state_id" onchange="onStateChange(this.value)">
-                        <option value="" disabled selected>Choose State</option>
-                    </select>
-                </div>
-            </div>
+        <div class="form-group">
+          <label for="state_id">Select State</label>
+          <div class="select-wrap" id="state-wrap">
+            <select
+              id="state_id"
+              name="state_id"
+              onchange="onStateChange(this.value)"
+            >
+              <option value="" disabled selected>Choose State</option>
+            </select>
+          </div>
+        </div>
 
-            <div class="form-group">
-                <label for="project_id">Select Project for Plantation</label>
-                <div class="select-wrap disabled-wrap" id="project-wrap">
-                    <select id="project_id" name="project_id" disabled onchange="onProjectChange(this.value)">
-                        <option value="" disabled selected>Choose Project</option>
-                    </select>
-                </div>
-            </div>
+        <div class="form-group">
+          <label for="project_id">Select Project for Plantation</label>
+          <div class="select-wrap disabled-wrap" id="project-wrap">
+            <select
+              id="project_id"
+              name="project_id"
+              disabled
+              onchange="onProjectChange(this.value)"
+            >
+              <option value="" disabled selected>Choose Project</option>
+            </select>
+          </div>
+        </div>
 
-            <!-- ─── SECTION: SPECIES / PLANTS ─── -->
-            <div class="section-label">Distribute Plants by Species</div>
+        <!-- ─── SECTION: SPECIES / PLANTS ─── -->
+        <div class="section-label">Distribute Plants by Species</div>
 
-            <div class="species-block">
-                <div class="species-header">
-                    <span class="sp-title">🌿 Plant Distribution</span>
-                    <button type="button" class="btn-add-species" id="addSpeciesBtn" onclick="addSpeciesRow()">＋ Add
-                        Species</button>
-                </div>
-                <div id="spContainer"></div>
-            </div>
-
-            <!-- ─── ORDER SUMMARY ─── -->
-            <div class="summary-card" id="summaryCard">
-                <div class="sm-title">Order Summary</div>
-                <div class="summary-grid">
-                    <div class="sm-item">
-                        <div class="sm-val" id="sm-trees">0</div>
-                        <div class="sm-lbl">Total Trees</div>
-                    </div>
-                    <div class="sm-item">
-                        <div class="sm-val" id="sm-amount">₹0</div>
-                        <div class="sm-lbl">Total Amount</div>
-                    </div>
-                    <div class="sm-item">
-                        <div class="sm-val" id="sm-co2">0 kg</div>
-                        <div class="sm-lbl">CO₂ Offset</div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- ─── SECTION: OPTIONAL DETAILS ─── -->
-            <div class="section-label">Additional Details</div>
-
-            <div class="form-group">
-                <label for="message">Message / Dedication</label>
-                <textarea id="message" name="message"
-                    placeholder="Dedicate this plantation to someone special…"></textarea>
-            </div>
-
-            <!-- ─── SUBMIT ─── -->
-            <button type="button" class="submit-btn" id="submitBtn" onclick="submitForm()">
-                🌱 Submit Plantation
+        <div class="species-block">
+          <div class="species-header">
+            <span class="sp-title">🌿 Plant Distribution</span>
+            <button
+              type="button"
+              class="btn-add-species"
+              id="addSpeciesBtn"
+              onclick="addSpeciesRow()"
+            >
+              ＋ Add Species
             </button>
+          </div>
+          <div id="spContainer"></div>
+        </div>
 
-        </form>
+        <!-- ─── ORDER SUMMARY ─── -->
+        <div class="summary-card" id="summaryCard">
+          <div class="sm-title">Order Summary</div>
+          <div class="summary-grid">
+            <div class="sm-item">
+              <div class="sm-val" id="sm-trees">0</div>
+              <div class="sm-lbl">Total Trees</div>
+            </div>
+            <div class="sm-item">
+              <div class="sm-val" id="sm-amount">₹0</div>
+              <div class="sm-lbl">Total Amount</div>
+            </div>
+            <div class="sm-item">
+              <div class="sm-val" id="sm-co2">0 kg</div>
+              <div class="sm-lbl">CO₂ Offset</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── SECTION: OPTIONAL DETAILS ─── -->
+        <div class="section-label">Additional Details</div>
+
+        <div class="form-group">
+          <label for="message">Message / Dedication</label>
+          <textarea
+            id="message"
+            name="message"
+            placeholder="Dedicate this plantation to someone special…"
+          ></textarea>
+        </div>
+
+        <!-- ─── SUBMIT ─── -->
+        <button
+          type="button"
+          class="submit-btn"
+          id="submitBtn"
+          onclick="submitForm()"
+        >
+          🌱 Submit Plantation
+        </button>
+      </form>
     </div>
 
     <!-- ═══════════════════════════════════════════
      JAVASCRIPT
 ═══════════════════════════════════════════ -->
     <script>
-        /* ─────────────────────────────────────────────
-         *  GeoTree Plantation Form
-         *  Communicates with React Native via postMessage
-         *  Parent / WebView calls window.set*() to inject data
-         * ───────────────────────────────────────────── */
+      /* ─────────────────────────────────────────────
+       *  GeoTree Plantation Form
+       *  Communicates with React Native via postMessage
+       *  Parent / WebView calls window.set*() to inject data
+       * ───────────────────────────────────────────── */
 
-        let speciesRowCount = 0;
-        let speciesData = {};  // { rowIdx: [{ _id, name, variations: [{height, price}] }] }
-        let statesCache = [];
-        let projectsCache = [];
+      let speciesRowCount = 0;
+      let speciesData = {}; // { rowIdx: [{ _id, name, variations: [{height, price}] }] }
+      let statesCache = [];
+      let projectsCache = [];
 
-        // ── URL PARAMETERS READER ──
-        const urlParams = new URLSearchParams(window.location.search);
-        const PARAMS = {
-            occasion_id: urlParams.get('occasion_id') || '',
-            name: urlParams.get('name') || '',
-            user_id: urlParams.get('user_id') || '',
-            state_id: urlParams.get('state_id') || '',
-            project_id: urlParams.get('project_id') || urlParams.get('site_id') || ''
-        };
+      // ── URL PARAMETERS READER ──
+      const urlParams = new URLSearchParams(window.location.search);
+      const PARAMS = {
+        occasion_id: urlParams.get("occasion_id") || "",
+        name: urlParams.get("name") || "",
+        user_id: urlParams.get("user_id") || "",
+        state_id: urlParams.get("state_id") || "",
+        project_id:
+          urlParams.get("project_id") || urlParams.get("site_id") || "",
+      };
 
-        // ── postMessage helper ──
-        function postToApp(msg) {
-            const str = JSON.stringify(msg);
-            if (window.ReactNativeWebView) {
-                window.ReactNativeWebView.postMessage(str);
-            } else if (window.parent && window.parent !== window) {
-                window.parent.postMessage(msg, '*');
-            }
+      // ── postMessage helper ──
+      function postToApp(msg) {
+        const str = JSON.stringify(msg);
+        if (window.ReactNativeWebView) {
+          window.ReactNativeWebView.postMessage(str);
+        } else if (window.parent && window.parent !== window) {
+          window.parent.postMessage(msg, "*");
+        }
+      }
+
+      // ── Toast helper ──
+      function showToast(msg, isError = false) {
+        const t = document.getElementById("toast");
+        t.textContent = msg;
+        t.className = "toast" + (isError ? " error-toast" : "") + " show";
+        setTimeout(() => {
+          t.className = "toast" + (isError ? " error-toast" : "");
+        }, 3000);
+      }
+
+      // ── Progress bar ──
+      function updateProgress() {
+        const reqFields = document.querySelectorAll("[required]");
+        let filled = 0;
+        reqFields.forEach((el) => {
+          if (el.value.trim()) filled++;
+        });
+        const pct = reqFields.length
+          ? Math.round((filled / reqFields.length) * 100)
+          : 0;
+        document.getElementById("progressFill").style.width = pct + "%";
+      }
+
+      /* ─────────────────────────────────────────────
+       *  APP → FORM: Inject data functions
+       * ───────────────────────────────────────────── */
+
+      // App calls this with state list
+      window.setStates = function (states) {
+        statesCache = states;
+        const sel = document.getElementById("state_id");
+        sel.innerHTML =
+          '<option value="" disabled selected>Choose State</option>';
+        states.forEach((s) => {
+          const o = document.createElement("option");
+          o.value = s._id || s.id;
+          o.textContent = s.state_name || s.name;
+          sel.appendChild(o);
+        });
+      };
+
+      // App calls this after REQUEST_PROJECTS
+      //   window.setProjects = function (projects) {
+      //     projectsCache = projects;
+      //     const sel = document.getElementById("project_id");
+      //     const wrap = document.getElementById("project-wrap");
+      //     sel.innerHTML =
+      //       '<option value="" disabled selected>Choose Project</option>';
+      //     projects.forEach((p) => {
+      //       const o = document.createElement("option");
+      //       o.value = p._id || p.id;
+      //       o.textContent = p.site_name || p.name;
+      //       sel.appendChild(o);
+      //     });
+      //     const isEmpty = projects.length === 0;
+      //     sel.disabled = isEmpty;
+      //     if (wrap) wrap.classList.toggle("disabled-wrap", isEmpty);
+      //     syncAndUpdateSummary();
+      //   };
+
+      window.setProjects = function (projects) {
+        alert("Projects Count = " + projects.length);
+
+        console.log("Projects =>", projects);
+
+        projectsCache = projects;
+
+        const sel = document.getElementById("project_id");
+
+        sel.innerHTML =
+          '<option value="" disabled selected>Choose Project</option>';
+
+        projects.forEach((p) => {
+          const o = document.createElement("option");
+          o.value = p._id || p.id;
+          o.textContent = p.site_name || p.name;
+          sel.appendChild(o);
+        });
+      };
+
+      // App calls this with species for a specific row
+      window.setSpeciesForRow = function (rowIdx, species) {
+        speciesData[rowIdx] = species;
+        const sel = document.getElementById("sp-plant-" + rowIdx);
+        if (!sel) return;
+        sel.innerHTML =
+          '<option value="" disabled selected>Select plant</option>';
+        species.forEach((sp) => {
+          const o = document.createElement("option");
+          o.value = sp._id || sp.id;
+          o.textContent = sp.name;
+          sel.appendChild(o);
+        });
+        syncAndUpdateSummary();
+      };
+
+      // App calls this with occasions (no-op — occasions are set via window.setOccasion)
+      window.setOccasions = function () {};
+
+      // App pre-fills form (e.g. from carbon result or IPL)
+      window.prefillForm = function (data) {
+        if (data.name) document.getElementById("name").value = data.name;
+        if (data.date) document.getElementById("date").value = data.date;
+        if (data.message)
+          document.getElementById("message").value = data.message;
+        if (data.state_id) {
+          const sel = document.getElementById("state_id");
+          sel.value = data.state_id;
+          onStateChange(data.state_id);
+        }
+        syncAndUpdateSummary();
+      };
+
+      /**
+       * App calls this to set the occasion BEFORE the form renders.
+       * @param {string} id         - occasion_id from backend
+       * @param {Array}  fields     - form_fields array from OccasionType
+       * @param {string} [label]    - optional occasion name shown as section title
+       */
+      window.setOccasion = function (id, fields, label) {
+        document.getElementById("occasion_id").value = id || "";
+
+        const container = document.getElementById("occasionFields");
+        container.innerHTML = "";
+
+        if (fields && fields.length) {
+          const title = document.createElement("div");
+          title.className = "section-label";
+          title.textContent = (label || "Occasion") + " Details";
+          container.appendChild(title);
+          fields.forEach((f) => container.appendChild(buildDynamicField(f)));
         }
 
-        // ── Toast helper ──
-        function showToast(msg, isError = false) {
-            const t = document.getElementById('toast');
-            t.textContent = msg;
-            t.className = 'toast' + (isError ? ' error-toast' : '') + ' show';
-            setTimeout(() => { t.className = 'toast' + (isError ? ' error-toast' : ''); }, 3000);
+        syncAndUpdateSummary();
+      };
+
+      function buildDynamicField(field) {
+        const {
+          label,
+          key,
+          field_type = "text",
+          is_required = false,
+          placeholder = "",
+          options = [],
+        } = field;
+        const wrap = document.createElement("div");
+        wrap.className = "form-group";
+        wrap.dataset.key = key;
+
+        const lbl = document.createElement("label");
+        lbl.htmlFor = "dyn-" + key;
+        lbl.innerHTML =
+          label + (is_required ? ' <span class="req">*</span>' : "");
+        wrap.appendChild(lbl);
+
+        let inp;
+        if (field_type === "textarea") {
+          inp = document.createElement("textarea");
+          inp.rows = 3;
+        } else if (field_type === "dropdown") {
+          inp = document.createElement("select");
+          inp.innerHTML = `<option value="" disabled selected>${placeholder || "Select " + label}</option>`;
+          options.forEach((o) => {
+            const op = document.createElement("option");
+            op.value = o;
+            op.textContent = o;
+            inp.appendChild(op);
+          });
+        } else {
+          inp = document.createElement("input");
+          inp.type = field_type;
+        }
+        inp.id = "dyn-" + key;
+        inp.name = "occ_" + key;
+        inp.placeholder = placeholder;
+        if (is_required) inp.required = true;
+        inp.addEventListener("input", syncAndUpdateSummary);
+        wrap.appendChild(inp);
+        return wrap;
+      }
+
+      /* ─────────────────────────────────────────────
+       *  LOCATION CASCADES
+       * ───────────────────────────────────────────── */
+      //   function onStateChange(stateId) {
+      //     const projSel = document.getElementById("project_id");
+      //     const projWrap = document.getElementById("project-wrap");
+      //     projSel.innerHTML =
+      //       '<option value="" disabled selected>Loading…</option>';
+      //     projSel.disabled = true;
+      //     if (projWrap) projWrap.classList.add("disabled-wrap");
+
+      //     postToApp({ type: "REQUEST_PROJECTS", state_id: stateId });
+
+      //     // ── DEMO MOCK ──
+      //     if (!window.ReactNativeWebView) {
+      //       setTimeout(() => {
+      //         window.setProjects([
+      //           {
+      //             _id: "proj_demo_1",
+      //             site_name:
+      //               "Eco-Park Project (" + stateId.split("_").pop() + ")",
+      //           },
+      //           { _id: "proj_demo_2", site_name: "Reforestation Site B" },
+      //         ]);
+      //       }, 600);
+      //     }
+
+      //     // Re-fetch species for all rows
+      //     for (let i = 1; i <= speciesRowCount; i++) {
+      //       if (document.getElementById("sp-plant-" + i)) {
+      //         postToApp({
+      //           type: "REQUEST_SPECIES_LIST",
+      //           rowIdx: i,
+      //           state_id: stateId,
+      //           project_id: "",
+      //         });
+      //       }
+      //     }
+      //     syncAndUpdateSummary();
+      //   }
+
+      async function onStateChange(stateId) {
+        const projSel = document.getElementById("project_id");
+        const projWrap = document.getElementById("project-wrap");
+
+        projSel.innerHTML =
+          '<option value="" disabled selected>Loading...</option>';
+        projSel.disabled = true;
+
+        if (projWrap) {
+          projWrap.classList.add("disabled-wrap");
         }
 
-        // ── Progress bar ──
-        function updateProgress() {
-            const reqFields = document.querySelectorAll('[required]');
-            let filled = 0;
-            reqFields.forEach(el => { if (el.value.trim()) filled++; });
-            const pct = reqFields.length ? Math.round((filled / reqFields.length) * 100) : 0;
-            document.getElementById('progressFill').style.width = pct + '%';
-        }
+        try {
+          const response = await fetch("/api/site/list", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              state_id: stateId,
+            }),
+          });
 
-        /* ─────────────────────────────────────────────
-         *  APP → FORM: Inject data functions
-         * ───────────────────────────────────────────── */
+          const result = await response.json();
 
-        // App calls this with state list
-        window.setStates = function (states) {
-            statesCache = states;
-            const sel = document.getElementById('state_id');
-            sel.innerHTML = '<option value="" disabled selected>Choose State</option>';
-            states.forEach(s => {
-                const o = document.createElement('option');
-                o.value = s._id || s.id;
-                o.textContent = s.state_name || s.name;
-                sel.appendChild(o);
+          console.log("Project API Response:", result);
+
+          if (result.status) {
+            const projects = result.data || [];
+
+            projSel.innerHTML =
+              '<option value="" disabled selected>Choose Project</option>';
+
+            projects.forEach((project) => {
+              const option = document.createElement("option");
+              option.value = project._id;
+              option.textContent =
+                project.site_name || project.project_name || project.name;
+              projSel.appendChild(option);
             });
-        };
 
-        // App calls this after REQUEST_PROJECTS
-        window.setProjects = function (projects) {
+            projSel.disabled = false;
+
+            if (projWrap) {
+              projWrap.classList.remove("disabled-wrap");
+            }
+
+            // Cache for later use
             projectsCache = projects;
-            const sel = document.getElementById('project_id');
-            const wrap = document.getElementById('project-wrap');
-            sel.innerHTML = '<option value="" disabled selected>Choose Project</option>';
-            projects.forEach(p => {
-                const o = document.createElement('option');
-                o.value = p._id || p.id;
-                o.textContent = p.site_name || p.name;
-                sel.appendChild(o);
+          } else {
+            projSel.innerHTML =
+              '<option value="" disabled selected>No Project Found</option>';
+          }
+        } catch (error) {
+          console.error("Project fetch error:", error);
+
+          projSel.innerHTML =
+            '<option value="" disabled selected>Failed To Load</option>';
+        }
+
+        // Re-fetch species rows
+        for (let i = 1; i <= speciesRowCount; i++) {
+          if (document.getElementById("sp-plant-" + i)) {
+            postToApp({
+              type: "REQUEST_SPECIES_LIST",
+              rowIdx: i,
+              state_id: stateId,
+              project_id: "",
             });
-            const isEmpty = projects.length === 0;
-            sel.disabled = isEmpty;
-            if (wrap) wrap.classList.toggle('disabled-wrap', isEmpty);
-            syncAndUpdateSummary();
-        };
+          }
+        }
 
-        // App calls this with species for a specific row
-        window.setSpeciesForRow = function (rowIdx, species) {
-            speciesData[rowIdx] = species;
-            const sel = document.getElementById('sp-plant-' + rowIdx);
-            if (!sel) return;
-            sel.innerHTML = '<option value="" disabled selected>Select plant</option>';
-            species.forEach(sp => {
-                const o = document.createElement('option');
-                o.value = sp._id || sp.id;
-                o.textContent = sp.name;
-                sel.appendChild(o);
+        syncAndUpdateSummary();
+      }
+
+      function onProjectChange(projectId) {
+        const stateId = document.getElementById("state_id").value;
+        postToApp({
+          type: "REQUEST_SPECIES_LIST",
+          rowIdx: 0,
+          state_id: stateId,
+          project_id: projectId,
+        });
+
+        // ── DEMO MOCK ──
+        if (!window.ReactNativeWebView) {
+          for (let i = 1; i <= speciesRowCount; i++) {
+            window.setSpeciesForRow(i, [
+              {
+                _id: "sp_1",
+                name: "Neem",
+                variations: [
+                  { height: "1-2 ft", price: 150 },
+                  { height: "2-3 ft", price: 250 },
+                ],
+              },
+              {
+                _id: "sp_4",
+                name: "Banyan",
+                variations: [{ height: "2-3 ft", price: 300 }],
+              },
+            ]);
+          }
+        }
+
+        for (let i = 1; i <= speciesRowCount; i++) {
+          if (document.getElementById("sp-plant-" + i)) {
+            postToApp({
+              type: "REQUEST_SPECIES_LIST",
+              rowIdx: i,
+              state_id: stateId,
+              project_id: projectId,
             });
-            syncAndUpdateSummary();
-        };
-
-        // App calls this with occasions (no-op — occasions are set via window.setOccasion)
-        window.setOccasions = function () { };
-
-
-        // App pre-fills form (e.g. from carbon result or IPL)
-        window.prefillForm = function (data) {
-            if (data.name) document.getElementById('name').value = data.name;
-            if (data.date) document.getElementById('date').value = data.date;
-            if (data.message) document.getElementById('message').value = data.message;
-            if (data.state_id) {
-                const sel = document.getElementById('state_id');
-                sel.value = data.state_id;
-                onStateChange(data.state_id);
-            }
-            syncAndUpdateSummary();
-        };
-
-        /**
-         * App calls this to set the occasion BEFORE the form renders.
-         * @param {string} id         - occasion_id from backend
-         * @param {Array}  fields     - form_fields array from OccasionType
-         * @param {string} [label]    - optional occasion name shown as section title
-         */
-        window.setOccasion = function (id, fields, label) {
-            document.getElementById('occasion_id').value = id || '';
-
-            const container = document.getElementById('occasionFields');
-            container.innerHTML = '';
-
-            if (fields && fields.length) {
-                const title = document.createElement('div');
-                title.className = 'section-label';
-                title.textContent = (label || 'Occasion') + ' Details';
-                container.appendChild(title);
-                fields.forEach(f => container.appendChild(buildDynamicField(f)));
-            }
-
-            syncAndUpdateSummary();
-        };
-
-        function buildDynamicField(field) {
-            const { label, key, field_type = 'text', is_required = false, placeholder = '', options = [] } = field;
-            const wrap = document.createElement('div');
-            wrap.className = 'form-group';
-            wrap.dataset.key = key;
-
-            const lbl = document.createElement('label');
-            lbl.htmlFor = 'dyn-' + key;
-            lbl.innerHTML = label + (is_required ? ' <span class="req">*</span>' : '');
-            wrap.appendChild(lbl);
-
-            let inp;
-            if (field_type === 'textarea') {
-                inp = document.createElement('textarea');
-                inp.rows = 3;
-            } else if (field_type === 'dropdown') {
-                inp = document.createElement('select');
-                inp.innerHTML = `<option value="" disabled selected>${placeholder || 'Select ' + label}</option>`;
-                options.forEach(o => { const op = document.createElement('option'); op.value = o; op.textContent = o; inp.appendChild(op); });
-            } else {
-                inp = document.createElement('input');
-                inp.type = field_type;
-            }
-            inp.id = 'dyn-' + key;
-            inp.name = 'occ_' + key;
-            inp.placeholder = placeholder;
-            if (is_required) inp.required = true;
-            inp.addEventListener('input', syncAndUpdateSummary);
-            wrap.appendChild(inp);
-            return wrap;
+          }
         }
+        syncAndUpdateSummary();
+      }
 
-        /* ─────────────────────────────────────────────
-         *  LOCATION CASCADES
-         * ───────────────────────────────────────────── */
-        function onStateChange(stateId) {
-            const projSel = document.getElementById('project_id');
-            const projWrap = document.getElementById('project-wrap');
-            projSel.innerHTML = '<option value="" disabled selected>Loading…</option>';
-            projSel.disabled = true;
-            if (projWrap) projWrap.classList.add('disabled-wrap');
+      /* ─────────────────────────────────────────────
+       *  SPECIES ROWS
+       * ───────────────────────────────────────────── */
+      function addSpeciesRow() {
+        speciesRowCount++;
+        const idx = speciesRowCount;
+        const container = document.getElementById("spContainer");
 
-            postToApp({ type: 'REQUEST_PROJECTS', state_id: stateId });
-
-            // ── DEMO MOCK ──
-            if (!window.ReactNativeWebView) {
-                setTimeout(() => {
-                    window.setProjects([
-                        { _id: 'proj_demo_1', site_name: 'Eco-Park Project (' + stateId.split('_').pop() + ')' },
-                        { _id: 'proj_demo_2', site_name: 'Reforestation Site B' }
-                    ]);
-                }, 600);
-            }
-
-            // Re-fetch species for all rows
-            for (let i = 1; i <= speciesRowCount; i++) {
-                if (document.getElementById('sp-plant-' + i)) {
-                    postToApp({ type: 'REQUEST_SPECIES_LIST', rowIdx: i, state_id: stateId, project_id: '' });
-                }
-            }
-            syncAndUpdateSummary();
-        }
-
-        function onProjectChange(projectId) {
-            const stateId = document.getElementById('state_id').value;
-            postToApp({ type: 'REQUEST_SPECIES_LIST', rowIdx: 0, state_id: stateId, project_id: projectId });
-
-            // ── DEMO MOCK ──
-            if (!window.ReactNativeWebView) {
-                for (let i = 1; i <= speciesRowCount; i++) {
-                    window.setSpeciesForRow(i, [
-                        { _id: 'sp_1', name: 'Neem', variations: [{ height: '1-2 ft', price: 150 }, { height: '2-3 ft', price: 250 }] },
-                        { _id: 'sp_4', name: 'Banyan', variations: [{ height: '2-3 ft', price: 300 }] }
-                    ]);
-                }
-            }
-
-            for (let i = 1; i <= speciesRowCount; i++) {
-                if (document.getElementById('sp-plant-' + i)) {
-                    postToApp({ type: 'REQUEST_SPECIES_LIST', rowIdx: i, state_id: stateId, project_id: projectId });
-                }
-            }
-            syncAndUpdateSummary();
-        }
-
-        /* ─────────────────────────────────────────────
-         *  SPECIES ROWS
-         * ───────────────────────────────────────────── */
-        function addSpeciesRow() {
-            speciesRowCount++;
-            const idx = speciesRowCount;
-            const container = document.getElementById('spContainer');
-
-            const row = document.createElement('div');
-            row.className = 'sp-row';
-            row.id = 'sp-row-' + idx;
-            row.innerHTML = `
+        const row = document.createElement("div");
+        row.className = "sp-row";
+        row.id = "sp-row-" + idx;
+        row.innerHTML = `
   <div class="form-group sp-plant">
     <label for="sp-plant-${idx}">Plant Name</label>
     <div class="select-wrap">
@@ -1102,7 +1310,7 @@
       <div class="select-wrap">
         <select id="sp-qty-${idx}" name="plants[${idx}][quantity]" onchange="onQtyChange(${idx})">
           <option value="" disabled selected>Qty</option>
-          ${[1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100].map(n => `<option value="${n}">${n}</option>`).join('')}
+          ${[1, 2, 3, 4, 5, 10, 15, 20, 25, 50, 100].map((n) => `<option value="${n}">${n}</option>`).join("")}
         </select>
       </div>
     </div>
@@ -1121,296 +1329,360 @@
   </div>
   <div class="sp-row-footer">
     <span class="sp-summary" id="sp-sum-${idx}">—</span>
-    ${idx > 1 ? `<button type="button" class="btn-remove-sp" onclick="removeSpeciesRow(${idx})">🗑 Remove</button>` : ''}
+    ${idx > 1 ? `<button type="button" class="btn-remove-sp" onclick="removeSpeciesRow(${idx})">🗑 Remove</button>` : ""}
   </div>`;
-            container.appendChild(row);
+        container.appendChild(row);
 
-            // Request species for this row
-            const stateId = document.getElementById('state_id').value;
-            const projectId = document.getElementById('project_id').value;
-            postToApp({ type: 'REQUEST_SPECIES_LIST', rowIdx: idx, state_id: stateId, project_id: projectId });
-            syncAndUpdateSummary();
+        // Request species for this row
+        const stateId = document.getElementById("state_id").value;
+        const projectId = document.getElementById("project_id").value;
+        postToApp({
+          type: "REQUEST_SPECIES_LIST",
+          rowIdx: idx,
+          state_id: stateId,
+          project_id: projectId,
+        });
+        syncAndUpdateSummary();
+      }
+
+      function removeSpeciesRow(idx) {
+        const row = document.getElementById("sp-row-" + idx);
+        if (row) {
+          row.remove();
+          syncAndUpdateSummary();
         }
+      }
 
-        function removeSpeciesRow(idx) {
-            const row = document.getElementById('sp-row-' + idx);
-            if (row) { row.remove(); syncAndUpdateSummary(); }
+      function onPlantChange(idx, plantId) {
+        // Populate height options from cached species variations
+        const plants = speciesData[idx] || [];
+        const plant = plants.find((p) => (p._id || p.id) === plantId);
+        const htSel = document.getElementById("sp-ht-" + idx);
+        const prInp = document.getElementById("sp-pr-" + idx);
+
+        htSel.innerHTML = '<option value="" disabled selected>Height</option>';
+        prInp.value = "";
+
+        if (plant && plant.variations && plant.variations.length) {
+          plant.variations.forEach((v) => {
+            const o = document.createElement("option");
+            o.value = v.height;
+            o.dataset.price = v.price || 0;
+            o.textContent = v.height + " cm — ₹" + (v.price || 0);
+            htSel.appendChild(o);
+          });
+          // Auto-select first
+          htSel.selectedIndex = 1;
+          const firstVar = plant.variations[0];
+          prInp.value = firstVar.price || 0;
         }
+        syncAndUpdateSummary();
+      }
 
-        function onPlantChange(idx, plantId) {
-            // Populate height options from cached species variations
-            const plants = speciesData[idx] || [];
-            const plant = plants.find(p => (p._id || p.id) === plantId);
-            const htSel = document.getElementById('sp-ht-' + idx);
-            const prInp = document.getElementById('sp-pr-' + idx);
+      function onQtyChange(idx) {
+        syncAndUpdateSummary();
+      }
 
-            htSel.innerHTML = '<option value="" disabled selected>Height</option>';
-            prInp.value = '';
+      // When height changes → update price
+      document.addEventListener("change", function (e) {
+        const el = e.target;
+        const match = el.id && el.id.match(/^sp-ht-(\d+)$/);
+        if (match) {
+          const idx = match[1];
+          const opt = el.options[el.selectedIndex];
+          const prInp = document.getElementById("sp-pr-" + idx);
+          if (prInp && opt) prInp.value = opt.dataset.price || 0;
+          syncAndUpdateSummary();
+        }
+      });
 
-            if (plant && plant.variations && plant.variations.length) {
-                plant.variations.forEach(v => {
-                    const o = document.createElement('option');
-                    o.value = v.height;
-                    o.dataset.price = v.price || 0;
-                    o.textContent = v.height + ' cm — ₹' + (v.price || 0);
-                    htSel.appendChild(o);
-                });
-                // Auto-select first
-                htSel.selectedIndex = 1;
-                const firstVar = plant.variations[0];
-                prInp.value = firstVar.price || 0;
+      /* ─────────────────────────────────────────────
+       *  COLLECT + SYNC DATA
+       * ───────────────────────────────────────────── */
+      function collectData() {
+        const plants = [];
+        let totalTrees = 0,
+          totalAmount = 0;
+
+        for (let i = 1; i <= speciesRowCount; i++) {
+          const row = document.getElementById("sp-row-" + i);
+          if (!row) continue;
+
+          const plantId =
+            (document.getElementById("sp-plant-" + i) || {}).value || "";
+          const qty =
+            Number((document.getElementById("sp-qty-" + i) || {}).value) || 0;
+          const height =
+            (document.getElementById("sp-ht-" + i) || {}).value || "";
+          const price =
+            Number((document.getElementById("sp-pr-" + i) || {}).value) || 0;
+
+          if (plantId) {
+            plants.push({
+              plant_id: plantId,
+              quantity: qty,
+              tree_height: height,
+              price,
+            });
+            totalTrees += qty;
+            totalAmount += qty * price;
+
+            const sumEl = document.getElementById("sp-sum-" + i);
+            if (sumEl && qty) {
+              sumEl.innerHTML = `Qty: <span>${qty}</span> · Total: <span>₹${(qty * price).toLocaleString()}</span>`;
             }
-            syncAndUpdateSummary();
+          }
         }
 
-        function onQtyChange(idx) {
-            syncAndUpdateSummary();
-        }
-
-        // When height changes → update price
-        document.addEventListener('change', function (e) {
-            const el = e.target;
-            const match = el.id && el.id.match(/^sp-ht-(\d+)$/);
-            if (match) {
-                const idx = match[1];
-                const opt = el.options[el.selectedIndex];
-                const prInp = document.getElementById('sp-pr-' + idx);
-                if (prInp && opt) prInp.value = opt.dataset.price || 0;
-                syncAndUpdateSummary();
-            }
+        // Occasion dynamic fields
+        const occasionData = {};
+        document.querySelectorAll("#occasionFields [name]").forEach((el) => {
+          if (el.name.startsWith("occ_"))
+            occasionData[el.name.replace("occ_", "")] = el.value;
         });
 
-        /* ─────────────────────────────────────────────
-         *  COLLECT + SYNC DATA
-         * ───────────────────────────────────────────── */
-        function collectData() {
-            const plants = [];
-            let totalTrees = 0, totalAmount = 0;
+        return {
+          name: document.getElementById("name").value.trim(),
+          date: document.getElementById("date").value,
+          state_id: document.getElementById("state_id").value,
+          project_id: document.getElementById("project_id").value,
+          occasion_id: document.getElementById("occasion_id").value,
+          message: document.getElementById("message").value.trim(),
+          plants,
+          occasion_data: occasionData,
+          // Totals for UI
+          _totalTrees: totalTrees,
+          _totalAmount: totalAmount,
+        };
+      }
 
-            for (let i = 1; i <= speciesRowCount; i++) {
-                const row = document.getElementById('sp-row-' + i);
-                if (!row) continue;
+      function syncAndUpdateSummary() {
+        const data = collectData();
 
-                const plantId = (document.getElementById('sp-plant-' + i) || {}).value || '';
-                const qty = Number((document.getElementById('sp-qty-' + i) || {}).value) || 0;
-                const height = (document.getElementById('sp-ht-' + i) || {}).value || '';
-                const price = Number((document.getElementById('sp-pr-' + i) || {}).value) || 0;
+        // Update summary card
+        const summaryCard = document.getElementById("summaryCard");
+        if (data._totalTrees > 0) {
+          summaryCard.classList.add("visible");
+          document.getElementById("sm-trees").textContent = data._totalTrees;
+          document.getElementById("sm-amount").textContent =
+            "₹" + data._totalAmount.toLocaleString();
+          document.getElementById("sm-co2").textContent =
+            data._totalTrees * 20 + " kg";
+        } else {
+          summaryCard.classList.remove("visible");
+        }
 
-                if (plantId) {
-                    plants.push({ plant_id: plantId, quantity: qty, tree_height: height, price });
-                    totalTrees += qty;
-                    totalAmount += qty * price;
+        updateProgress();
 
-                    const sumEl = document.getElementById('sp-sum-' + i);
-                    if (sumEl && qty) {
-                        sumEl.innerHTML = `Qty: <span>${qty}</span> · Total: <span>₹${(qty * price).toLocaleString()}</span>`;
-                    }
-                }
+        // Live-sync to parent app
+        postToApp({ type: "PLANTATION_FORM_DATA", payload: data });
+      }
+
+      /* ─────────────────────────────────────────────
+       *  SUBMIT
+       * ───────────────────────────────────────────── */
+      function submitForm() {
+        const data = collectData();
+
+        // Validate required
+        if (!data.name) {
+          showToast("Name is required", true);
+          return;
+        }
+        if (!data.date) {
+          showToast("Date is required", true);
+          return;
+        }
+        if (!data.plants.length) {
+          showToast("Please add at least one plant species", true);
+          return;
+        }
+
+        // Check required dynamic occasion fields
+        let valid = true;
+        document
+          .querySelectorAll("#occasionFields [required]")
+          .forEach((el) => {
+            if (!el.value.trim()) {
+              valid = false;
             }
-
-            // Occasion dynamic fields
-            const occasionData = {};
-            document.querySelectorAll('#occasionFields [name]').forEach(el => {
-                if (el.name.startsWith('occ_')) occasionData[el.name.replace('occ_', '')] = el.value;
-            });
-
-            return {
-                name: document.getElementById('name').value.trim(),
-                date: document.getElementById('date').value,
-                state_id: document.getElementById('state_id').value,
-                project_id: document.getElementById('project_id').value,
-                occasion_id: document.getElementById('occasion_id').value,
-                message: document.getElementById('message').value.trim(),
-                plants,
-                occasion_data: occasionData,
-                // Totals for UI
-                _totalTrees: totalTrees,
-                _totalAmount: totalAmount
-            };
+          });
+        if (!valid) {
+          showToast("Please fill all required occasion fields", true);
+          return;
         }
 
-        function syncAndUpdateSummary() {
-            const data = collectData();
+        // Disable button
+        document.getElementById("submitBtn").disabled = true;
+        document.getElementById("loadingOverlay").classList.add("visible");
 
-            // Update summary card
-            const summaryCard = document.getElementById('summaryCard');
-            if (data._totalTrees > 0) {
-                summaryCard.classList.add('visible');
-                document.getElementById('sm-trees').textContent = data._totalTrees;
-                document.getElementById('sm-amount').textContent = '₹' + data._totalAmount.toLocaleString();
-                document.getElementById('sm-co2').textContent = (data._totalTrees * 20) + ' kg';
-            } else {
-                summaryCard.classList.remove('visible');
-            }
-
-            updateProgress();
-
-            // Live-sync to parent app
-            postToApp({ type: 'PLANTATION_FORM_DATA', payload: data });
-        }
-
-        /* ─────────────────────────────────────────────
-         *  SUBMIT
-         * ───────────────────────────────────────────── */
-        function submitForm() {
-            const data = collectData();
-
-            // Validate required
-            if (!data.name) { showToast('Name is required', true); return; }
-            if (!data.date) { showToast('Date is required', true); return; }
-            if (!data.plants.length) { showToast('Please add at least one plant species', true); return; }
-
-            // Check required dynamic occasion fields
-            let valid = true;
-            document.querySelectorAll('#occasionFields [required]').forEach(el => {
-                if (!el.value.trim()) { valid = false; }
-            });
-            if (!valid) { showToast('Please fill all required occasion fields', true); return; }
-
-            // Disable button
-            document.getElementById('submitBtn').disabled = true;
-            document.getElementById('loadingOverlay').classList.add('visible');
-
-            // Build API payload (matching POST /plantation/plantations/add)
-            const payload = {
-                name: data.name,
-                date: data.date,
-                state_id: data.state_id,
-                site_id: data.project_id,
-                project_id: data.project_id,
-                occasion_id: data.occasion_id || undefined,
-                message: data.message || undefined,
-                plants: JSON.stringify(data.plants),
-                occasion_data: JSON.stringify(data.occasion_data)
-            };
-
-            postToApp({ type: 'PLANTATION_SUBMIT', payload });
-        }
-
-        // Store last successful response for the continue button
-        let lastSubmitResponse = null;
-
-        // App calls this after API response
-        window.onSubmitSuccess = function (response) {
-            document.getElementById('loadingOverlay').classList.remove('visible');
-            document.getElementById('submitBtn').disabled = false;
-
-            // Save response for continue action
-            lastSubmitResponse = response;
-
-            // Populate success overlay with summary data
-            const data = collectData();
-            document.getElementById('ss-trees').textContent = data._totalTrees;
-            document.getElementById('ss-amount').textContent = '₹' + data._totalAmount.toLocaleString();
-            document.getElementById('ss-co2').textContent = (data._totalTrees * 20) + ' kg';
-
-            // Show the success overlay
-            document.getElementById('successOverlay').classList.add('visible');
-
-            // Notify the app that submission was successful with the full response
-            postToApp({ type: 'PLANTATION_SUBMIT_SUCCESS', data: response });
+        // Build API payload (matching POST /plantation/plantations/add)
+        const payload = {
+          name: data.name,
+          date: data.date,
+          state_id: data.state_id,
+          site_id: data.project_id,
+          project_id: data.project_id,
+          occasion_id: data.occasion_id || undefined,
+          message: data.message || undefined,
+          plants: JSON.stringify(data.plants),
+          occasion_data: JSON.stringify(data.occasion_data),
         };
 
-        // Called when user taps "Continue" on the success screen
-        function continueToNext() {
-            // Send NAVIGATE_NEXT with the plantation response so the app can build the next screen
-            postToApp({
-                type: 'NAVIGATE_NEXT',
-                screen: 'plantation_success',
-                data: lastSubmitResponse
-            });
-        }
+        postToApp({ type: "PLANTATION_SUBMIT", payload });
+      }
 
-        window.onSubmitError = function (error) {
-            document.getElementById('loadingOverlay').classList.remove('visible');
-            document.getElementById('submitBtn').disabled = false;
-            showToast(error || 'Submission failed. Try again.', true);
-        };
+      // Store last successful response for the continue button
+      let lastSubmitResponse = null;
 
-        function goBack() {
-            postToApp({ type: 'GO_BACK' });
-            if (window.history.length > 1) window.history.back();
-        }
+      // App calls this after API response
+      window.onSubmitSuccess = function (response) {
+        document.getElementById("loadingOverlay").classList.remove("visible");
+        document.getElementById("submitBtn").disabled = false;
 
-        /* ─────────────────────────────────────────────
-         *  INIT
-         * ───────────────────────────────────────────── */
-        window.addEventListener('load', function () {
-            // Set today's date
-            const dateEl = document.getElementById('date');
-            dateEl.value = new Date().toISOString().split('T')[0];
+        // Save response for continue action
+        lastSubmitResponse = response;
 
-            // Show progress bar
-            document.getElementById('progressBar').style.display = 'block';
+        // Populate success overlay with summary data
+        const data = collectData();
+        document.getElementById("ss-trees").textContent = data._totalTrees;
+        document.getElementById("ss-amount").textContent =
+          "₹" + data._totalAmount.toLocaleString();
+        document.getElementById("ss-co2").textContent =
+          data._totalTrees * 20 + " kg";
 
-            // Add first species row
-            addSpeciesRow();
+        // Show the success overlay
+        document.getElementById("successOverlay").classList.add("visible");
 
+        // Notify the app that submission was successful with the full response
+        postToApp({ type: "PLANTATION_SUBMIT_SUCCESS", data: response });
+      };
 
-            // Live sync on all inputs
-            document.getElementById('plantationForm').addEventListener('input', syncAndUpdateSummary);
-
-            // Notify app — ready
-            postToApp({ type: 'PLANTATION_FORM_READY' });
-
-            // 1. Apply URL Params immediately
-            if (PARAMS.name) document.getElementById('name').value = PARAMS.name;
-            if (PARAMS.occasion_id) {
-                document.getElementById('occasion_id').value = PARAMS.occasion_id;
-                fetchOccasionDetails(PARAMS.occasion_id);
-            }
-
-            // 2. Auto-fetch data (Standalone Mode)
-            fetchStates();
-
-            // ── DEMO MODE: seed data when NOT inside a WebView (browser preview) ──
-            if (!window.ReactNativeWebView && !PARAMS.occasion_id) {
-                setTimeout(function () {
-                    window.setStates([
-                        { _id: 'state_demo_1', state_name: 'Maharashtra' },
-                        { _id: 'state_demo_2', state_name: 'Rajasthan' }
-                    ]);
-                    window.setSpeciesForRow(1, [
-                        { _id: 'sp_1', name: 'Neem', variations: [{ height: '1-2 ft', price: 150 }] }
-                    ]);
-                }, 300);
-            }
+      // Called when user taps "Continue" on the success screen
+      function continueToNext() {
+        // Send NAVIGATE_NEXT with the plantation response so the app can build the next screen
+        postToApp({
+          type: "NAVIGATE_NEXT",
+          screen: "plantation_success",
+          data: lastSubmitResponse,
         });
+      }
 
-        // ── STANDALONE DATA FETCHERS (relative to backend APIs) ──
-        async function fetchStates() {
-            try {
-                // Adjust base URL if needed. Here we assume the form is in /forms/ and API is relative
-                const res = await fetch('/occasion/states');
-                const data = await res.json();
-                if (data.status && data.data) {
-                    window.setStates(data.data);
-                    if (PARAMS.state_id) {
-                        document.getElementById('state_id').value = PARAMS.state_id;
-                        onStateChange(PARAMS.state_id);
-                    }
-                }
-            } catch (e) {
-                console.log('Standalone fetchStates skipped (waiting for app)');
-                postToApp({ type: 'REQUEST_STATES' });
-            }
+      window.onSubmitError = function (error) {
+        document.getElementById("loadingOverlay").classList.remove("visible");
+        document.getElementById("submitBtn").disabled = false;
+        showToast(error || "Submission failed. Try again.", true);
+      };
+
+      function goBack() {
+        postToApp({ type: "GO_BACK" });
+        if (window.history.length > 1) window.history.back();
+      }
+
+      /* ─────────────────────────────────────────────
+       *  INIT
+       * ───────────────────────────────────────────── */
+      window.addEventListener("load", function () {
+        // Set today's date
+        const dateEl = document.getElementById("date");
+        dateEl.value = new Date().toISOString().split("T")[0];
+
+        // Show progress bar
+        document.getElementById("progressBar").style.display = "block";
+
+        // Add first species row
+        addSpeciesRow();
+
+        // Live sync on all inputs
+        document
+          .getElementById("plantationForm")
+          .addEventListener("input", syncAndUpdateSummary);
+
+        // Notify app — ready
+        postToApp({ type: "PLANTATION_FORM_READY" });
+
+        // 1. Apply URL Params immediately
+        if (PARAMS.name) document.getElementById("name").value = PARAMS.name;
+        if (PARAMS.occasion_id) {
+          document.getElementById("occasion_id").value = PARAMS.occasion_id;
+          fetchOccasionDetails(PARAMS.occasion_id);
         }
 
-        async function fetchOccasionDetails(id) {
-            if (!id) return;
-            try {
-                const res = await fetch('/occasion/list/' + id);
-                const data = await res.json();
-                if (data.status && data.data) {
-                    const occ = data.data;
-                    window.setOccasion(occ._id, occ.form_fields, occ.name);
-                }
-            } catch (e) {
-                console.log('Standalone fetchOccasionDetails skipped (waiting for app)');
-                postToApp({ type: 'REQUEST_OCCASIONS', id: id });
-            }
+        // 2. Auto-fetch data (Standalone Mode)
+        fetchStates();
+
+        // ── DEMO MODE: seed data when NOT inside a WebView (browser preview) ──
+        if (!window.ReactNativeWebView && !PARAMS.occasion_id) {
+          setTimeout(function () {
+            window.setStates([
+              { _id: "state_demo_1", state_name: "Maharashtra" },
+              { _id: "state_demo_2", state_name: "Rajasthan" },
+            ]);
+            window.setSpeciesForRow(1, [
+              {
+                _id: "sp_1",
+                name: "Neem",
+                variations: [{ height: "1-2 ft", price: 150 }],
+              },
+            ]);
+          }, 300);
         }
+      });
+
+      // ── STANDALONE DATA FETCHERS (relative to backend APIs) ──
+      async function fetchStates() {
+        try {
+          // Adjust base URL if needed. Here we assume the form is in /forms/ and API is relative
+          //   const res = await fetch('/occasion/states');
+          const res = await fetch("/api/state/list");
+
+          const data = await res.json();
+          if (data.status && data.data) {
+            window.setStates(data.data);
+            if (PARAMS.state_id) {
+              document.getElementById("state_id").value = PARAMS.state_id;
+              onStateChange(PARAMS.state_id);
+            }
+          }
+        } catch (e) {
+          console.log("Standalone fetchStates skipped (waiting for app)");
+          postToApp({ type: "REQUEST_STATES" });
+        }
+      }
+
+      //   async function fetchStates() {
+      //     try {
+      //       const res = await fetch("/api/state/list");
+
+      //       const data = await res.json();
+
+      //       console.log("State API Response", data);
+
+      //       if (data.status && data.data) {
+      //         window.setStates(data.data);
+      //       }
+      //     } catch (e) {
+      //       console.log("State API Error", e);
+      //       postToApp({ type: "REQUEST_STATES" });
+      //     }
+      //   }
+
+      async function fetchOccasionDetails(id) {
+        if (!id) return;
+        try {
+          const res = await fetch("/occasion/list/" + id);
+          const data = await res.json();
+          if (data.status && data.data) {
+            const occ = data.data;
+            window.setOccasion(occ._id, occ.form_fields, occ.name);
+          }
+        } catch (e) {
+          console.log(
+            "Standalone fetchOccasionDetails skipped (waiting for app)",
+          );
+          postToApp({ type: "REQUEST_OCCASIONS", id: id });
+        }
+      }
     </script>
-</body>
-
+  </body>
 </html>
