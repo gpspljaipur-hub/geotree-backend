@@ -1241,46 +1241,94 @@
         syncAndUpdateSummary();
       }
 
-      function onProjectChange(projectId) {
+      //   function onProjectChange(projectId) {
+      //     const stateId = document.getElementById("state_id").value;
+      //     postToApp({
+      //       type: "REQUEST_SPECIES_LIST",
+      //       rowIdx: 0,
+      //       state_id: stateId,
+      //       project_id: projectId,
+      //     });
+
+      //     // ── DEMO MOCK ──
+      //     if (!window.ReactNativeWebView) {
+      //       for (let i = 1; i <= speciesRowCount; i++) {
+      //         window.setSpeciesForRow(i, [
+      //           {
+      //             _id: "sp_1",
+      //             name: "Neem",
+      //             variations: [
+      //               { height: "1-2 ft", price: 150 },
+      //               { height: "2-3 ft", price: 250 },
+      //             ],
+      //           },
+      //           {
+      //             _id: "sp_4",
+      //             name: "Banyan",
+      //             variations: [{ height: "2-3 ft", price: 300 }],
+      //           },
+      //         ]);
+      //       }
+      //     }
+
+      //     for (let i = 1; i <= speciesRowCount; i++) {
+      //       if (document.getElementById("sp-plant-" + i)) {
+      //         postToApp({
+      //           type: "REQUEST_SPECIES_LIST",
+      //           rowIdx: i,
+      //           state_id: stateId,
+      //           project_id: projectId,
+      //         });
+      //       }
+      //     }
+      //     syncAndUpdateSummary();
+      //   }
+
+      async function onProjectChange(projectId) {
         const stateId = document.getElementById("state_id").value;
-        postToApp({
-          type: "REQUEST_SPECIES_LIST",
-          rowIdx: 0,
-          state_id: stateId,
-          project_id: projectId,
-        });
 
-        // ── DEMO MOCK ──
-        if (!window.ReactNativeWebView) {
-          for (let i = 1; i <= speciesRowCount; i++) {
-            window.setSpeciesForRow(i, [
-              {
-                _id: "sp_1",
-                name: "Neem",
-                variations: [
-                  { height: "1-2 ft", price: 150 },
-                  { height: "2-3 ft", price: 250 },
-                ],
-              },
-              {
-                _id: "sp_4",
-                name: "Banyan",
-                variations: [{ height: "2-3 ft", price: 300 }],
-              },
-            ]);
-          }
-        }
-
-        for (let i = 1; i <= speciesRowCount; i++) {
-          if (document.getElementById("sp-plant-" + i)) {
-            postToApp({
-              type: "REQUEST_SPECIES_LIST",
-              rowIdx: i,
+        try {
+          const response = await fetch("/api/species/list", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
               state_id: stateId,
-              project_id: projectId,
-            });
+              site_id: projectId,
+            }),
+          });
+
+          const result = await response.json();
+
+          console.log("Species Response:", result);
+
+          if (result.status && result.data) {
+            for (let i = 1; i <= speciesRowCount; i++) {
+              const plantSelect = document.getElementById("sp-plant-" + i);
+
+              if (!plantSelect) continue;
+
+              plantSelect.innerHTML =
+                '<option value="" disabled selected>Select Plant</option>';
+
+              result.data.forEach((species) => {
+                const option = document.createElement("option");
+                option.value = species._id;
+                option.textContent = species.name;
+                plantSelect.appendChild(option);
+              });
+            }
+
+            // cache for height/price logic
+            for (let i = 1; i <= speciesRowCount; i++) {
+              speciesData[i] = result.data;
+            }
           }
+        } catch (err) {
+          console.error("Species API Error:", err);
         }
+
         syncAndUpdateSummary();
       }
 
