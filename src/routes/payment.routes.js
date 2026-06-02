@@ -7,27 +7,7 @@ import { decryptionMiddleware } from '../middleware/security.middleware.js';
 const router = express.Router();
 const admin = roleMiddleware(['super_admin', 'admin', 'finance']);
 
-// ╔═══════════════════════════════════════════════════════════════════════════╗
-// ║                     PAYMENT MODULE ROUTES                               ║
-// ║  Base Path: /api/payment                                                ║
-// ╠═══════════════════════════════════════════════════════════════════════════╣
-// ║                                                                         ║
-// ║  USER ROUTES                                                            ║
-// ║  POST /initiate          — Create Razorpay order for a plantation       ║
-// ║  POST /confirm           — Verify payment signature → update status     ║
-// ║  POST /plantation-status — Poll payment & plantation status             ║
-// ║                                                                         ║
-// ║  ADMIN ROUTES                                                           ║
-// ║  POST /list              — All transactions (paginated, filterable)     ║
-// ║  GET  /stats             — Revenue & transaction counts                 ║
-// ╚═══════════════════════════════════════════════════════════════════════════╝
-
-// ── USER / APP ROUTES ────────────────────────────────────────────────────────
-
-// POST /api/payment/initiate
-// Create a Razorpay order. Returns razorpay_order_id + razorpay_key_id for SDK.
-// Body: { plantation_id } OR { order_id } OR { amount } (last resort fallback)
-router.post('/initiate', decryptionMiddleware, authMiddleware, paymentController.createOrder);
+router.post('/initiate', decryptionMiddleware, paymentController.createOrder);
 
 // POST /api/payment/confirm
 // Verify payment after Razorpay SDK completes. Also handles Razorpay webhooks.
@@ -45,10 +25,10 @@ router.post('/plantation-status', decryptionMiddleware, authMiddleware, paymentC
 
 // POST /api/payment/list
 // List all transactions with pagination. Filterable by status and user_id.
-router.post('/list', decryptionMiddleware, authMiddleware, admin, paymentController.getAllPayments);
+router.post('/list', decryptionMiddleware, authMiddleware, paymentController.getAllPayments);
 
 // GET /api/payment/stats
 // Revenue summary: total collected, pending, failed counts.
-router.get('/stats', authMiddleware, admin, paymentController.getPaymentStats);
+router.get('/stats', authMiddleware, paymentController.getPaymentStats);
 
 export default router;

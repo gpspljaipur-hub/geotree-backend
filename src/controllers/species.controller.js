@@ -7,6 +7,34 @@ import { getRequestParams, parseBoolean } from "../utils/request.util.js";
 import { deleteFile } from "../utils/file.util.js";
 
 /**
+ * Fallback parser for sloppy/invalid JSON strings in variations like `[{height: 5 fit,price: 100}]`
+ */
+function parseSloppyJsonArray(str) {
+    if (!str) return [];
+    const results = [];
+    const blockRegex = /\{([^{}]+)\}/g;
+    let match;
+    while ((match = blockRegex.exec(str)) !== null) {
+        const blockContent = match[1];
+        
+        let height = "";
+        const heightMatch = blockContent.match(/height\s*:\s*([^,{}]+)/i);
+        if (heightMatch) {
+            height = heightMatch[1].replace(/['"]/g, '').trim();
+        }
+        
+        let priceVal = 0;
+        const priceMatch = blockContent.match(/(?:price|rate)\s*:\s*([^,{}]+)/i);
+        if (priceMatch) {
+            priceVal = Number(priceMatch[1].replace(/['"]/g, '').trim()) || 0;
+        }
+        
+        results.push({ height, price: priceVal });
+    }
+    return results;
+}
+
+/**
  * Normalise request body to internal snake_case field names.
  * Accepts both camelCase (from frontend) and snake_case (from Postman/API).
  */
@@ -15,7 +43,11 @@ function normaliseSpeciesBody(body) {
         name,
         scientific_name, scientificName,
         description,
-        variations, heightPriceList,
+        variations,
+        heightPriceList,
+        height,
+        price,
+        rate,
         status,
         co2_absorption, sequestration,
         maturity_period, maturityPeriod,
@@ -27,14 +59,24 @@ function normaliseSpeciesBody(body) {
     let parsedVariations = variations || heightPriceList;
     if (parsedVariations !== undefined) {
         if (typeof parsedVariations === 'string') {
-            try { parsedVariations = JSON.parse(parsedVariations); } catch (e) { parsedVariations = []; }
+            try {
+                parsedVariations = JSON.parse(parsedVariations);
+            } catch (e) {
+                // Fallback parser if JSON.parse fails (e.g. key/value lack quotes)
+                parsedVariations = parseSloppyJsonArray(parsedVariations);
+            }
         }
         if (Array.isArray(parsedVariations)) {
             parsedVariations = parsedVariations.map(v => ({
-                height: v.height,
+                height: v.height !== undefined ? String(v.height).trim() : "",
                 price: Number(v.price ?? v.rate ?? 0)
             }));
         }
+    } else if (height !== undefined || price !== undefined || rate !== undefined) {
+        parsedVariations = [{
+            height: height !== undefined ? String(height).trim() : "",
+            price: Number(price ?? rate ?? 0)
+        }];
     }
 
     const data = {};
@@ -166,6 +208,7 @@ export const getById = asyncHandler(async (req, res) => {
 
 // @desc    Create new species
 export const create = asyncHandler(async (req, res) => {
+    console.log('===>>>', req.body)
     const { data } = normaliseSpeciesBody(req.body);
 
     // Provide creation fallbacks

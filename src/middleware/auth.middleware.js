@@ -24,17 +24,17 @@ const authMiddleware = async (req, res, next) => {
 
         req.user = decoded; // { id, role, type }
 
-        if (decoded.type === "user") {
-            const user = await myUser.findById(decoded.id).select('token tokens status').lean();
-            if (!user || user.status === false) {
-                return res.status(401).json({ status: false, message: "Account disabled. Please contact support." });
-            }
-            const tokenList = Array.isArray(user.tokens) ? user.tokens : [];
-            const tokenMatches = tokenList.includes(token) || user.token === token;
-            if (!tokenMatches) {
-                return res.status(401).json({ status: false, message: "Session expired. Please log in again." });
-            }
-        }
+        // if (decoded.type === "user") {
+        //     const user = await myUser.findById(decoded.id).select('token tokens status').lean();
+        //     if (!user || user.status === false) {
+        //         return res.status(401).json({ status: false, message: "Account disabled. Please contact support." });
+        //     }
+        //     const tokenList = Array.isArray(user.tokens) ? user.tokens : [];
+        //     const tokenMatches = tokenList.includes(token) || user.token === token;
+        //     if (!tokenMatches) {
+        //         return res.status(401).json({ status: false, message: "Session expired. Please log in again." });
+        //     }
+        // }
 
         next();
     } catch (err) {
