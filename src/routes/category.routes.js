@@ -7,7 +7,7 @@ import { decryptionMiddleware } from '../middleware/security.middleware.js';
 const router = express.Router();
 
 // Get list of categories
-router.all('/list', decryptionMiddleware, authMiddleware, categoryController.getCategoryList);
+router.all('/list', decryptionMiddleware, categoryController.getCategoryList);
 
 // Add a new category
 router.post('/add', decryptionMiddleware, authMiddleware, roleMiddleware(['super_admin', 'admin']), categoryController.uploadCategoryImageMiddleware, categoryController.addCategory);

@@ -13,12 +13,14 @@ const RAZORPAY_KEY_ID = process.env.RAZORPAY_KEY_ID;
 const RAZORPAY_KEY_SECRET = process.env.RAZORPAY_KEY_SECRET;
 
 if (!RAZORPAY_KEY_ID || !RAZORPAY_KEY_SECRET) {
-  console.error("❌ CRITICAL: Razorpay keys are missing in environment variables! Razorpay payments will fail.");
+  console.error(
+    "❌ CRITICAL: Razorpay keys are missing in environment variables! Razorpay payments will fail.",
+  );
 }
 
 const razorpay = new Razorpay({
   key_id: RAZORPAY_KEY_ID || "rzp_test_placeholder",
-  key_secret: RAZORPAY_KEY_SECRET || "placeholder_secret"
+  key_secret: RAZORPAY_KEY_SECRET || "placeholder_secret",
 });
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -42,7 +44,7 @@ export const createOrder = asyncHandler(async (req, res) => {
       .select('amount payment_status user_id');
     if (!plantationRecord) throw new ApiError(404, "Plantation record not found");
     // Don't allow re-payment for already completed plantations
-    if (plantationRecord.payment_status === 'Completed') {
+    if (plantationRecord.payment_status === "Completed") {
       throw new ApiError(400, "Payment already completed for this plantation");
     }
 
@@ -93,9 +95,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     plantation_id: linkedPlantationId || null,
     transaction_id: razorpayOrder.id,   // This is the Razorpay order_id or mock id
     amount: Number(finalAmount),
-    currency: 'INR',
-    method: 'Razorpay',
-    status: 'Pending'
+    currency: "INR",
+    method: "Razorpay",
+    status: "Pending",
   });
 
   // ── Mark plantation as payment_status: 'Initiated' for tracking ──────────
@@ -115,41 +117,50 @@ export const createOrder = asyncHandler(async (req, res) => {
       amount_inr: finalAmount,                  // Amount in rupees (for display)
       currency: razorpayOrder.currency,
       plantation_id: linkedPlantationId || null,
-      order_id: razorpayOrder.id || null
-    }
+      order_id: razorpayOrder.id || null,
+    },
   });
 });
 
 export const verifypayment = asyncHandler(async (req, res) => {
+  ensureRazorpaySecret();
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
-    let razorpay_order_id, razorpay_payment_id, expectedSignature, receivedSignature;
-    const isWebhook = !!req.headers['x-razorpay-signature'];
+    let razorpay_order_id,
+      razorpay_payment_id,
+      expectedSignature,
+      receivedSignature;
+    const isWebhook = !!req.headers["x-razorpay-signature"];
 
     if (isWebhook) {
       // ── WEBHOOK from Razorpay servers ────────────────────────────────────
-      const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
-      const rawBody = req.rawBody ? req.rawBody.toString() : JSON.stringify(req.body);
+      const webhookSecret =
+        process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
+      const rawBody = req.rawBody
+        ? req.rawBody.toString()
+        : JSON.stringify(req.body);
 
       expectedSignature = crypto
         .createHmac("sha256", webhookSecret)
         .update(rawBody)
         .digest("hex");
 
-      receivedSignature = req.headers['x-razorpay-signature'];
+      receivedSignature = req.headers["x-razorpay-signature"];
 
       const paymentEntity = req.body.payload?.payment?.entity;
       if (!paymentEntity) {
         await session.abortTransaction();
         session.endSession();
-        return res.json({ status: true, message: "Ignored: non-payment event" });
+        return res.json({
+          status: true,
+          message: "Ignored: non-payment event",
+        });
       }
 
       razorpay_order_id = paymentEntity.order_id;
       razorpay_payment_id = paymentEntity.id;
-
     } else {
       // ── Client-side confirmation from mobile/web app ──────────────────
       razorpay_order_id = req.body.razorpay_order_id;
@@ -159,7 +170,10 @@ export const verifypayment = asyncHandler(async (req, res) => {
       if (!razorpay_order_id || !razorpay_payment_id || !receivedSignature) {
         await session.abortTransaction();
         session.endSession();
-        throw new ApiError(400, "Missing required payment verification fields: razorpay_order_id, razorpay_payment_id, razorpay_signature");
+        throw new ApiError(
+          400,
+          "Missing required payment verification fields: razorpay_order_id, razorpay_payment_id, razorpay_signature",
+        );
       }
 
       const bodyData = razorpay_order_id + "|" + razorpay_payment_id;
@@ -174,15 +188,18 @@ export const verifypayment = asyncHandler(async (req, res) => {
       // Update transaction as failed
       await Transaction.findOneAndUpdate(
         { transaction_id: razorpay_order_id },
-        { status: 'Failed', gateway_response: req.body }
-      ).catch(e => console.error("Failed to mark transaction as failed:", e.message));
+        { status: "Failed", gateway_response: req.body },
+      ).catch((e) =>
+        console.error("Failed to mark transaction as failed:", e.message),
+      );
 
       await session.abortTransaction();
       session.endSession();
 
       return res.status(400).json({
         status: false,
-        message: "Payment verification failed: Invalid signature. Payment not accepted."
+        message:
+          "Payment verification failed: Invalid signature. Payment not accepted.",
       });
     }
 
@@ -190,22 +207,25 @@ export const verifypayment = asyncHandler(async (req, res) => {
     const txn = await Transaction.findOneAndUpdate(
       { transaction_id: razorpay_order_id },
       {
-        status: 'Completed',
+        status: "Completed",
         gateway_response: req.body,
-        razorpay_payment_id: razorpay_payment_id
+        razorpay_payment_id: razorpay_payment_id,
       },
-      { new: true, session }
+      { new: true, session },
     );
 
     if (!txn) {
-      console.warn(`[Payment] Transaction not found for Razorpay order: ${razorpay_order_id}`);
+      console.warn(
+        `[Payment] Transaction not found for Razorpay order: ${razorpay_order_id}`,
+      );
       await session.abortTransaction();
       session.endSession();
 
       return res.json({
         status: true,
-        message: "Payment received but transaction record not matched. Please contact support.",
-        razorpay_order_id
+        message:
+          "Payment received but transaction record not matched. Please contact support.",
+        razorpay_order_id,
       });
     }
 
@@ -215,15 +235,28 @@ export const verifypayment = asyncHandler(async (req, res) => {
     if (txn.plantation_id) {
       // link transaction to plantation and update status
       try {
-        const result = await completePlantationRecord(txn.plantation_id, razorpay_order_id, session);
+        const result = await completePlantationRecord(
+          txn.plantation_id,
+          razorpay_order_id,
+          session,
+        );
 
         if (result?.order?._id && !txn.order_id) {
           generatedOrderId = result.order._id;
-          await Transaction.findByIdAndUpdate(txn._id, { order_id: generatedOrderId }, { session });
+          await Transaction.findByIdAndUpdate(
+            txn._id,
+            { order_id: generatedOrderId },
+            { session },
+          );
         }
-        console.log(`[Payment] ✅ Plantation ${txn.plantation_id} marked as Completed`);
+        console.log(
+          `[Payment] ✅ Plantation ${txn.plantation_id} marked as Completed`,
+        );
       } catch (err) {
-        console.error(`[Verification] Error completing plantation record:`, err.message);
+        console.error(
+          `[Verification] Error completing plantation record:`,
+          err.message,
+        );
         // We continue because payment is confirmed anyway, but we log the error
       }
     }
@@ -232,10 +265,14 @@ export const verifypayment = asyncHandler(async (req, res) => {
     // NOTE: If txn.order_id was null, the order was just created by completePlantationRecord above.
     // If txn.order_id was already set (order-based payments), update it explicitly here.
     if (txn.order_id) {
-      await Order.findByIdAndUpdate(txn.order_id, {
-        payment_status: 'Paid',
-        order_status: 'Paid'
-      }, { session });
+      await Order.findByIdAndUpdate(
+        txn.order_id,
+        {
+          payment_status: "Paid",
+          order_status: "Paid",
+        },
+        { session },
+      );
     }
 
     await session.commitTransaction();
@@ -249,10 +286,9 @@ export const verifypayment = asyncHandler(async (req, res) => {
         order_id: generatedOrderId,
         razorpay_order_id,
         razorpay_payment_id,
-        amount_paid: txn.amount
-      }
+        amount_paid: txn.amount,
+      },
     });
-
   } catch (error) {
     if (session.inTransaction()) {
       await session.abortTransaction();
@@ -273,7 +309,9 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
   if (!plantation_id) throw new ApiError(400, "plantation_id is required");
 
   const plantation = await Plantation.findById(plantation_id)
-    .select('payment_status amount trees_count plantation_status planted_count transaction_id source')
+    .select(
+      "payment_status amount trees_count plantation_status planted_count transaction_id source",
+    )
     .lean();
 
   if (!plantation) throw new ApiError(404, "Plantation not found");
@@ -281,7 +319,7 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
   // Find most recent transaction for this plantation
   const txn = await Transaction.findOne({ plantation_id })
     .sort({ created_at: -1 })
-    .select('status transaction_id amount created_at')
+    .select("status transaction_id amount created_at")
     .lean();
 
   res.json({
@@ -300,10 +338,10 @@ export const getPlantationPaymentStatus = asyncHandler(async (req, res) => {
           razorpay_order_id: txn.transaction_id,
           gateway_status: txn.status,
           amount: txn.amount,
-          initiated_at: txn.created_at
+          initiated_at: txn.created_at,
         }
-        : null
-    }
+        : null,
+    },
   });
 });
 
@@ -316,12 +354,12 @@ export const getAllPayments = asyncHandler(async (req, res) => {
   const {
     page = 1,
     limit = 10,
-    status,         // 'Pending' | 'Completed' | 'Failed'
-    user_id,        // filter by user
-    plantation_id,  // filter by plantation
-    from_date,      // date range start (ISO string)
-    to_date,        // date range end (ISO string)
-    transaction_id  // search by exact Razorpay order ID
+    status, // 'Pending' | 'Completed' | 'Failed'
+    user_id, // filter by user
+    plantation_id, // filter by plantation
+    from_date, // date range start (ISO string)
+    to_date, // date range end (ISO string)
+    transaction_id, // search by exact Razorpay order ID
   } = req.body;
 
   // ── Build Filter ──────────────────────────────────────────────────────────
@@ -343,15 +381,17 @@ export const getAllPayments = asyncHandler(async (req, res) => {
 
   const [payments, total] = await Promise.all([
     Transaction.find(filter)
-      .select('transaction_id razorpay_payment_id amount currency status method created_at user_id order_id plantation_id')
-      .populate('user_id', 'name email mobile')
-      .populate('order_id', 'order_status amount')
-      .populate('plantation_id', 'payment_status trees_count source amount')
+      .select(
+        "transaction_id razorpay_payment_id amount currency status method created_at user_id order_id plantation_id",
+      )
+      .populate("user_id", "name email mobile")
+      .populate("order_id", "order_status amount")
+      .populate("plantation_id", "payment_status trees_count source amount")
       .sort({ created_at: -1 })
       .skip((pageNum - 1) * limitNum)
       .limit(limitNum)
       .lean(),
-    Transaction.countDocuments(filter)
+    Transaction.countDocuments(filter),
   ]);
 
   // ── Flatten for admin table display ──────────────────────────────────────
@@ -387,8 +427,8 @@ export const getAllPayments = asyncHandler(async (req, res) => {
       total,
       page: pageNum,
       limit: limitNum,
-      pages: Math.ceil(total / limitNum)
-    }
+      pages: Math.ceil(total / limitNum),
+    },
   });
 });
 
@@ -402,14 +442,16 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
       $group: {
         _id: null,
         total_revenue: {
-          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, "$amount", 0] }
+          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, "$amount", 0] },
         },
-        completed: { $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] } },
+        completed: {
+          $sum: { $cond: [{ $eq: ["$status", "Completed"] }, 1, 0] },
+        },
         failed: { $sum: { $cond: [{ $eq: ["$status", "Failed"] }, 1, 0] } },
         pending: { $sum: { $cond: [{ $eq: ["$status", "Pending"] }, 1, 0] } },
-        total_count: { $sum: 1 }
-      }
-    }
+        total_count: { $sum: 1 },
+      },
+    },
   ]);
 
   const result = stats[0] || {
@@ -417,7 +459,7 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
     completed: 0,
     failed: 0,
     pending: 0,
-    total_count: 0
+    total_count: 0,
   };
 
   res.json({
@@ -428,8 +470,8 @@ export const getPaymentStats = asyncHandler(async (req, res) => {
       counts: {
         completed: result.completed,
         failed: result.failed,
-        pending: result.pending
-      }
-    }
+        pending: result.pending,
+      },
+    },
   });
 });
