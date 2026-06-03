@@ -1,7 +1,4 @@
-import "dotenv/config";
-// Standardize environment string to lowercase for cross-platform and cross-case comparisons
-if (process.env.NODE_ENV)
-  process.env.NODE_ENV = process.env.NODE_ENV.toLowerCase();
+
 import express from "express";
 import connectDB from "./config/db.js";
 import mongoose from "mongoose";
@@ -43,6 +40,13 @@ import siteRoutes from "./routes/site.routes.js";
 import legalRoutes from "./routes/legal.routes.js";
 import dashboardRoutes from "./routes/dashboard.router.js";
 import seedAdmin from "./scripts/seedAdmin.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+if (process.env.NODE_ENV)
+  process.env.NODE_ENV = process.env.NODE_ENV.toLowerCase();
+console.log("NODE_ENV:", process.env.NODE_ENV);
+console.log("JWT_SECRET:", process.env.JWT_SECRET);
 // import { startIPLCron } from "./cron/ipl.cron.js";
 
 const __filename = fileURLToPath(import.meta.url);

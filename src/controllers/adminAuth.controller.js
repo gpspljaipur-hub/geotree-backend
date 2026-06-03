@@ -58,12 +58,10 @@ export const adminLogin = asyncHandler(async (req, res) => {
         role: admin.role,
         status: 'Success'
     });
-    const JWT_SECRET = process.env.JWT_SECRET;
-
 
     const token = jwt.sign(
         { id: admin._id, role: admin.role, type: 'admin' },
-        JWT_SECRET,
+        process.env.JWT_SECRET,
         { expiresIn: "12h" }
     );
 
