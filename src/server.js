@@ -292,7 +292,7 @@ const startServer = async () => {
     // Global Error Handler
     app.use(errorHandler);
 
-    const PORT = process.env.PORT || 5030;
+    const PORT = 5030;
     const server = app.listen(PORT, "0.0.0.0", () => {
       console.log(`🚀 Server running on PORT==== ${PORT}`);
       console.log(`📍 Health check: http://localhost:${PORT}/`);
