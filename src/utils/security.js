@@ -2,11 +2,12 @@ import crypto from 'crypto';
 
 // Use a fixed algorithm and key size
 const ALGORITHM = 'aes-256-cbc';
+const JWT_SECRET = "geotree_jwt_secret_key_development_only_1234567890"
 const IV_LENGTH = 16; // For AES, this is always 16
-if (!process.env.JWT_SECRET) {
+if (!JWT_SECRET) {
     throw new Error("JWT_SECRET is not defined in environment variables. Critical security risk.");
 }
-const KEY = crypto.scryptSync(process.env.JWT_SECRET, 'salt', 32);
+const KEY = crypto.scryptSync(JWT_SECRET, 'salt', 32);
 
 /**
  * Encrypts a string
