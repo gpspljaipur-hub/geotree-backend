@@ -126,7 +126,6 @@ export const verifypayment = asyncHandler(async (req, res) => {
   ensureRazorpaySecret();
   const session = await mongoose.startSession();
   session.startTransaction();
-
   try {
     let razorpay_order_id,
       razorpay_payment_id,
