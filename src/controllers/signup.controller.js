@@ -6,7 +6,9 @@ import { sendNotification } from "./firebase.controller.js";
 import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { getRequestParams } from "../utils/request.util.js";
+import dotenv from "dotenv";
 
+dotenv.config();
 // ─── OTP Helpers ──────────────────────────────────────────────────────────────
 
 /** Hash OTP with SHA-256 before storing — never stored plain-text */
@@ -269,12 +271,12 @@ export const verifyOTP = asyncHandler(async (req, res) => {
     }
   }
 
-  const JWT_SECRET = "geotree_jwt_secret_key_development_only_1234567890"
+
 
   // ── Step 3: Issue a fresh JWT (30-day — more secure than 365-day) ──────────
   const token = jwt.sign(
     { id: user._id, type: "user" },
-    JWT_SECRET,
+    process.env.JWT_SECRET,
     { expiresIn: "30d" }
   );
 
