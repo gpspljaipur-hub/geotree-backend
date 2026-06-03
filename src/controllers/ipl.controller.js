@@ -12,7 +12,6 @@ import { translateData } from "../utils/translation.util.js";
 import { getRequestParams, parseBoolean } from "../utils/request.util.js";
 import { deleteFile } from "../utils/file.util.js";
 import path from "path";
-import fs from "fs";
 
 import { executeSupportInternal, syncMatchLegacyFields } from "../utils/iplSupport.util.js";
 
