@@ -63,10 +63,8 @@ export const checkNumber = asyncHandler(async (req, res) => {
 
     // ── AUTO-LOGIN: Check if JWT + device_token are both valid ────────────
     if (existingUser.token && device_token && existingUser.device_token === device_token) {
-      const JWT_SECRET = "geotree_jwt_secret_key_development_only_1234567890"
-
       try {
-        jwt.verify(existingUser.token, JWT_SECRET);
+        jwt.verify(existingUser.token, process.env.JWT_SECRET || "geotree_jwt_secret_key_development_only_1234567890");
 
         // ✅ Token valid + device matches → AUTO-LOGIN (skip OTP entirely)
         const user = await myUser
@@ -276,7 +274,7 @@ export const verifyOTP = asyncHandler(async (req, res) => {
   // ── Step 3: Issue a fresh JWT (30-day — more secure than 365-day) ──────────
   const token = jwt.sign(
     { id: user._id, type: "user" },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET || "geotree_jwt_secret_key_development_only_1234567890",
     { expiresIn: "30d" }
   );
 

@@ -61,7 +61,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
 
     const token = jwt.sign(
         { id: admin._id, role: admin.role, type: 'admin' },
-        process.env.JWT_SECRET,
+        process.env.JWT_SECRET || "geotree_jwt_secret_key_development_only_1234567890",
         { expiresIn: "12h" }
     );
 
