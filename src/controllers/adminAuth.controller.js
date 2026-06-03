@@ -8,6 +8,10 @@ import asyncHandler from "../utils/asyncHandler.js";
 import ApiError from "../utils/ApiError.js";
 import { getRequestParams } from "../utils/request.util.js";
 import { sendEmail } from "../utils/email.util.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 
 // @desc    Admin Login
 export const adminLogin = asyncHandler(async (req, res) => {
@@ -54,7 +58,7 @@ export const adminLogin = asyncHandler(async (req, res) => {
         role: admin.role,
         status: 'Success'
     });
-    const JWT_SECRET = "geotree_jwt_secret_key_development_only_1234567890"
+    const JWT_SECRET = process.env.JWT_SECRET;
 
 
     const token = jwt.sign(
