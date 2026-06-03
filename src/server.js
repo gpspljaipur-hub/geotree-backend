@@ -1,4 +1,4 @@
-
+import "dotenv/config";
 import express from "express";
 import connectDB from "./config/db.js";
 import mongoose from "mongoose";
@@ -40,9 +40,7 @@ import siteRoutes from "./routes/site.routes.js";
 import legalRoutes from "./routes/legal.routes.js";
 import dashboardRoutes from "./routes/dashboard.router.js";
 import seedAdmin from "./scripts/seedAdmin.js";
-import dotenv from "dotenv";
 
-dotenv.config();
 if (process.env.NODE_ENV)
   process.env.NODE_ENV = process.env.NODE_ENV.toLowerCase();
 console.log("NODE_ENV:", process.env.NODE_ENV);

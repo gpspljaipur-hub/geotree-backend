@@ -8,7 +8,7 @@ const authMiddleware = async (req, res, next) => {
             return res.status(401).json({ status: false, message: "Authentication required" });
         }
 
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET || "geotree_jwt_secret_key_development_only_1234567890");
 
         // Debug logging only in development
         if (process.env.NODE_ENV === 'development') {
