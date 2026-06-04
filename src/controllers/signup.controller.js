@@ -126,7 +126,8 @@ export const checkNumber = asyncHandler(async (req, res) => {
         mobile: mobileNumber,
         number_verified: false,
         is_existing_user: true,
-        ...(process.env.NODE_ENV !== "production" && { otp })
+        otp
+        // ...(process.env.NODE_ENV !== "production" && { otp })
       }
     });
   }
