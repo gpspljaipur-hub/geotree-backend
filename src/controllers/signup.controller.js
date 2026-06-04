@@ -264,7 +264,10 @@ export const verifyOTP = asyncHandler(async (req, res) => {
       // Handle race condition: two requests for the same mobile simultaneously
       if (err.code === 11000) {
         user = await myUser.findOne({ mobile: mobileNumber });
-        if (!user) throw new ApiError(500, "Account creation failed. Please try again.");
+        if (!user) {
+          console.error("verifyOTP Account creation failed with duplicate key error:", err);
+          throw new ApiError(500, "Account creation failed. Please try again.");
+        }
       } else {
         throw err;
       }
