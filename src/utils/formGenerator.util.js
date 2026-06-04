@@ -376,8 +376,7 @@ export function generateOccasionFormHtml(occasion) {
     <div id="sp-container"></div>
   </div>
 
-  ${
-    form_fields.length > 0
+  ${form_fields.length > 0
       ? `
   <!-- ═══ OCCASION-SPECIFIC FIELDS ═══ -->
   <hr class="divider" />
@@ -385,7 +384,7 @@ export function generateOccasionFormHtml(occasion) {
   ${customFieldsHtml}
   `
       : '<p class="no-extra">No additional fields for this occasion.</p>'
-  }
+    }
 
   <div class="form-footer">
     <div id="form-error" class="error-msg">Please fill all required fields.</div>
