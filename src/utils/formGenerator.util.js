@@ -453,7 +453,7 @@ export function generateOccasionFormHtml(occasion) {
   //     console.error("Failed to fetch metadata from API:", err);
   //   }
   // }
-console.log(BASE_URL,"BASE_URLBASE_URLBASE_URL)
+  console.log(BASE_URL, "BASE_URLBASE_URLBASE_URL");
     async function fetchMetadata() {
         if (!BASE_URL) {
           console.warn("No valid BASE_URL");
