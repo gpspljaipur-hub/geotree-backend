@@ -46,6 +46,18 @@ const PERMANENT_FIELDS = [
   },
 ];
 
+function normalizeOptions(options) {
+  if (!Array.isArray(options)) return [];
+  if (options.length === 1 && typeof options[0] === 'string') {
+    const rawStr = options[0];
+    const parts = rawStr.split(/\s+(?=\d+\s*-\s*)/);
+    if (parts.length > 1) {
+      return parts.map(p => p.trim()).filter(Boolean);
+    }
+  }
+  return options.map(o => typeof o === 'string' ? o.trim() : o).filter(Boolean);
+}
+
 // Generates HTML for a single dynamic occasion-specific field
 function generateFieldHtml(field) {
   const {
@@ -65,7 +77,8 @@ function generateFieldHtml(field) {
       inputHtml = `<textarea id="${key}" name="${key}" placeholder="${placeholder}" ${req} rows="4"></textarea>`;
       break;
     case "dropdown": {
-      const opts = options
+      const normalizedOpts = normalizeOptions(options);
+      const opts = normalizedOpts
         .map((o) => `<option value="${o}">${o}</option>`)
         .join("\n          ");
       inputHtml = `<select id="${key}" name="${key}" ${req}>
@@ -96,6 +109,7 @@ function generateFieldHtml(field) {
 export function generateOccasionFormHtml(occasion) {
   const { name, form_fields = [], permanent_field_overrides = {} } = occasion;
   const occasionId = occasion._id?.toString() || "";
+  const hasCustomField = (key) => form_fields.some((f) => f.key === key);
 
   // Apply admin overrides to permanent field required flags
   const pf = {};
@@ -338,32 +352,36 @@ export function generateOccasionFormHtml(occasion) {
   <!-- ═══ PERMANENT: BASIC INFO ═══ -->
   <div class="section-label">Basic Information</div>
 
+  ${hasCustomField("name") ? "" : `
   <div class="form-group" data-key="name" data-permanent="true">
     <label for="name">Name${star("name")}</label>
     <input type="text" id="name" name="name" placeholder="Enter name" ${req("name")} />
-  </div>
+  </div>`}
 
+  ${hasCustomField("date") ? "" : `
   <div class="form-group" data-key="date" data-permanent="true">
     <label for="date">Date${star("date")}</label>
     <input type="date" id="date" name="date" ${req("date")} />
-  </div>
+  </div>`}
 
   <!-- ═══ PERMANENT: LOCATION ═══ -->
   <div class="section-label">Location</div>
 
+  ${hasCustomField("state_id") ? "" : `
   <div class="form-group" data-key="state_id" data-permanent="true">
     <label for="state_id">Select State${star("state_id")}</label>
     <select id="state_id" name="state_id" ${req("state_id")} onchange="onStateChange(this.value)">
       <option value="" disabled selected>Choose State</option>
     </select>
-  </div>
+  </div>`}
 
+  ${hasCustomField("project_id") ? "" : `
   <div class="form-group" data-key="project_id" data-permanent="true">
     <label for="project_id">Select Project for Plantation${star("project_id")}</label>
     <select id="project_id" name="project_id" ${req("project_id")} onchange="onProjectChange(this.value)" disabled>
       <option value="" disabled selected>Choose Project</option>
     </select>
-  </div>
+  </div>`}
 
   <!-- ═══ PERMANENT: SPECIES ROWS ═══ -->
   <div class="section-label">Distribute Plants by Species</div>
