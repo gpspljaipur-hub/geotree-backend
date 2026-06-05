@@ -392,7 +392,7 @@ export const getMatchList = asyncHandler(async (req, res) => {
 
     const [matches, total] = await Promise.all([
         Match.find({})
-            .populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name')
+            .populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name', 'team_color')
             .populate('tournament_id', 'name short_name')
             .sort({ [sortField]: sortOrder })
             .skip(skip)
