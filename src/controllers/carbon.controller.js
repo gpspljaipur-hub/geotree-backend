@@ -17,20 +17,36 @@ let factorsLastUpdated = 0;
 let isSeeded = false;
 const CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
+// const SEED_FACTORS = [
+//   { category: 'transport', sub_category: 'Car (Diesel)', value: 'car_diesel', factor: 0.171, unit: 'kg/km' },
+//   { category: 'transport', sub_category: 'Car (Petrol)', value: 'car_petrol', factor: 0.192, unit: 'kg/km' },
+//   { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.103, unit: 'kg/km' },
+//   { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.089, unit: 'kg/km' },
+//   { category: 'transport', sub_category: 'Train', value: 'train', factor: 0.041, unit: 'kg/km' },
+//   { category: 'transport', sub_category: 'Flight (Long Haul)', value: 'flight_long', factor: 450, unit: 'kg/flight' },
+//   { category: 'transport', sub_category: 'Flight (Short Haul)', value: 'flight_short', factor: 150, unit: 'kg/flight' },
+//   { category: 'energy', sub_category: 'Electricity', value: 'electricity', factor: 0.82, unit: 'kg/kWh' },
+//   { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 2.983, unit: 'kg/kg' },
+//   { category: 'waste', sub_category: 'General Waste', value: 'waste', factor: 0.5, unit: 'kg/kg' },
+//   { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 7.0, unit: 'kg/meal' },
+//   { category: 'food', sub_category: 'Vegetarian', value: 'vegetarian', factor: 2.0, unit: 'kg/meal' },
+//   { category: 'food', sub_category: 'Vegan', value: 'vegan', factor: 1.1, unit: 'kg/meal' }
+// ];
+
 const SEED_FACTORS = [
-  { category: 'transport', sub_category: 'Car (Diesel)', value: 'car_diesel', factor: 0.171, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Car (Petrol)', value: 'car_petrol', factor: 0.192, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.103, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.089, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Train', value: 'train', factor: 0.041, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Car (Diesel)', value: 'car_diesel', factor: 0.17, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Car (Petrol)', value: 'car_petrol', factor: 0.19, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.09, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.08, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Train', value: 'train', factor: 0.04, unit: 'kg/km' },
   { category: 'transport', sub_category: 'Flight (Long Haul)', value: 'flight_long', factor: 450, unit: 'kg/flight' },
   { category: 'transport', sub_category: 'Flight (Short Haul)', value: 'flight_short', factor: 150, unit: 'kg/flight' },
   { category: 'energy', sub_category: 'Electricity', value: 'electricity', factor: 0.82, unit: 'kg/kWh' },
-  { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 2.983, unit: 'kg/kg' },
-  { category: 'waste', sub_category: 'General Waste', value: 'waste', factor: 0.5, unit: 'kg/kg' },
-  { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 7.0, unit: 'kg/meal' },
+  { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 42.5, unit: 'kg/kg' },
+  { category: 'waste', sub_category: 'General Waste', value: 'waste', factor: 0.45, unit: 'kg/kg' },
+  { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 6.0, unit: 'kg/meal' },
   { category: 'food', sub_category: 'Vegetarian', value: 'vegetarian', factor: 2.0, unit: 'kg/meal' },
-  { category: 'food', sub_category: 'Vegan', value: 'vegan', factor: 1.1, unit: 'kg/meal' }
+  { category: 'food', sub_category: 'Vegan', value: 'vegan', factor: 1.5, unit: 'kg/meal' }
 ];
 
 const DEFAULT_SPECIES = [
@@ -72,10 +88,10 @@ const generateRecommendations = async (totalKg, speciesList, lang = 'en', state_
   // Find all sites that contain these species to show all locations
   const speciesIds = targetSpecies.map(s => s._id).filter(id => id && mongoose.isValidObjectId(id));
   let sites = speciesIds.length > 0
-    ? await Site.find({ 
-        native_species: { $in: speciesIds },
-        ...(state_id ? { state_id } : {})
-      })
+    ? await Site.find({
+      native_species: { $in: speciesIds },
+      ...(state_id ? { state_id } : {})
+    })
       .populate("state_id", "state_name")
       .lean()
     : [];
@@ -238,6 +254,7 @@ export const submitCarbon = asyncHandler(async (req, res) => {
     'waste': ['waste_kg'],
     'flight_long': ['flights_long', 'flight_long_haul'],
     'flight_short': ['flights_short', 'flight_short_haul'],
+    'air_travel': ['flights_long', 'flight_long_haul'],
     'motorbike': ['motorbike_km'],
     'car_petrol': ['carPetrol_km', 'car_petrol_km'],
     'car_diesel': ['carDiesel_km', 'car_diesel_km'],
@@ -250,7 +267,6 @@ export const submitCarbon = asyncHandler(async (req, res) => {
 
   factors.forEach(f => {
     let val = inputSource[f.value];
-
     // Check aliases if direct key not found
     if (val === undefined && keyMap[f.value]) {
       for (const alias of keyMap[f.value]) {
@@ -280,15 +296,15 @@ export const submitCarbon = asyncHandler(async (req, res) => {
   // Fetch species recommendations - handle state_id vs null (for defaults)
   const final_state_id = (state_id && state_id !== 'null' && state_id !== 'undefined') ? state_id : null;
   let availableSpecies = [];
-  
+
   if (final_state_id) {
     // 1. Find all sites in this state to get their native species
     const sitesInState = await Site.find({ state_id: final_state_id, status: true }).select('native_species').lean();
     const speciesIdsFromSites = sitesInState.flatMap(s => s.native_species || []).filter(id => id && mongoose.isValidObjectId(id));
 
     // 2. Fetch species that are either directly linked to state or linked via sites in state
-    availableSpecies = await Species.find({ 
-      status: true, 
+    availableSpecies = await Species.find({
+      status: true,
       $or: [
         { state_id: final_state_id },
         { _id: { $in: speciesIdsFromSites } }
@@ -300,9 +316,6 @@ export const submitCarbon = asyncHandler(async (req, res) => {
   }
 
   const recommendations = await generateRecommendations(totalAnnualKg, availableSpecies, lang, final_state_id);
-
-
-
 
   const entry = await Carbon.create({
     user_id: targetUser,
@@ -358,7 +371,7 @@ export const getCarbonResult = asyncHandler(async (req, res) => {
   }
 
   const { state_id, lang = 'en' } = getRequestParams(req, ['state_id', 'lang']);
-  
+
   // Normalize state_id
   const requestedStateId = (state_id && state_id !== 'null' && state_id !== 'undefined') ? state_id : null;
   const targetStateId = requestedStateId || carbon.state_id;
@@ -372,8 +385,8 @@ export const getCarbonResult = asyncHandler(async (req, res) => {
     const speciesIdsFromSites = sitesInState.flatMap(s => s.native_species || []).filter(id => id && mongoose.isValidObjectId(id));
 
     // 2. Fetch species that are either directly linked to state or linked via sites in state
-    availableSpecies = await Species.find({ 
-      status: true, 
+    availableSpecies = await Species.find({
+      status: true,
       $or: [
         { state_id: targetStateId },
         { _id: { $in: speciesIdsFromSites } }
