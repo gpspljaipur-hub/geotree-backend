@@ -123,7 +123,6 @@ export const createOrder = asyncHandler(async (req, res) => {
 });
 
 export const verifypayment = asyncHandler(async (req, res) => {
-  ensureRazorpaySecret();
   const session = await mongoose.startSession();
   session.startTransaction();
   try {
@@ -135,8 +134,16 @@ export const verifypayment = asyncHandler(async (req, res) => {
 
     if (isWebhook) {
       // ── WEBHOOK from Razorpay servers ────────────────────────────────────
-      const webhookSecret =
-        process.env.RAZORPAY_WEBHOOK_SECRET || RAZORPAY_KEY_SECRET;
+      const webhookSecret = process.env.RAZORPAY_WEBHOOK_SECRET;
+      if (!webhookSecret) {
+        console.error("❌ RAZORPAY_WEBHOOK_SECRET is not configured in environment variables!");
+        await session.abortTransaction();
+        session.endSession();
+        return res.status(500).json({
+          status: false,
+          message: "Webhook secret not configured on server",
+        });
+      }
       const rawBody = req.rawBody
         ? req.rawBody.toString()
         : JSON.stringify(req.body);
