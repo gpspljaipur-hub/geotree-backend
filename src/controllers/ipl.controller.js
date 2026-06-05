@@ -348,9 +348,9 @@ export const getMatchList = asyncHandler(async (req, res) => {
         const previousQuery = { ...filter, match_status: { $in: ['completed', 'previous'] } };
 
         let [todayMatches, upcomingMatches, previousMatches] = await Promise.all([
-            Match.find(todayQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name').sort({ match_date: 1 }).lean(),
-            Match.find(upcomingQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name').sort({ match_date: 1 }).skip(skip).limit(Number(limit)).lean(),
-            Match.find(previousQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name').sort({ match_date: -1 }).skip(skip).limit(Number(limit)).lean()
+            Match.find(todayQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color').sort({ match_date: 1 }).lean(),
+            Match.find(upcomingQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color').sort({ match_date: 1 }).skip(skip).limit(Number(limit)).lean(),
+            Match.find(previousQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color').sort({ match_date: -1 }).skip(skip).limit(Number(limit)).lean()
         ]);
 
         if (lang !== 'en') {
