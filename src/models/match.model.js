@@ -13,7 +13,8 @@ const MatchSchema = new mongoose.Schema({
   },
   match_date: {
     type: Date,
-    required: true
+    required: true,
+    index: true
   },
   match_time: {
     type: String,
@@ -26,7 +27,8 @@ const MatchSchema = new mongoose.Schema({
   match_status: {
     type: String,
     enum: ['upcoming', 'live', 'completed'],
-    default: 'upcoming'
+    default: 'upcoming',
+    index: true
   },
   status: {
     type: Boolean,
@@ -76,7 +78,8 @@ const MatchSchema = new mongoose.Schema({
   tournament_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Tournament',
-    required: false
+    required: false,
+    index: true
   }
 }, { timestamps: true });
 

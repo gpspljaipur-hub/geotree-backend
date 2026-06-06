@@ -331,7 +331,7 @@ export const getMatchList = asyncHandler(async (req, res) => {
     const { tournament_id, lang = 'en', page = 1, limit = 20, sort = 'match_date' } = getRequestParams(req, ['tournament_id', 'lang', 'page', 'limit', 'sort']);
     const isAdmin = req.user?.role === 'admin' || req.user?.role === 'super_admin';
 
-    const fetchMatches = async (filter) => {
+    const fetchMatches = async (filter, skipTranslation = false) => {
         const today = new Date();
         const { status } = getRequestParams(req, ['status']);
         if (status !== undefined) filter.status = parseBoolean(status);
@@ -353,7 +353,7 @@ export const getMatchList = asyncHandler(async (req, res) => {
             Match.find(previousQuery).populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color').sort({ match_date: -1 }).skip(skip).limit(Number(limit)).lean()
         ]);
 
-        if (lang !== 'en') {
+        if (lang !== 'en' && !skipTranslation) {
             const translated = await translateData([...todayMatches, ...upcomingMatches, ...previousMatches], ['venue'], lang);
             todayMatches = translated.slice(0, todayMatches.length);
             upcomingMatches = translated.slice(todayMatches.length, todayMatches.length + upcomingMatches.length);
@@ -364,8 +364,10 @@ export const getMatchList = asyncHandler(async (req, res) => {
     };
 
     if (tournament_id) {
-        const data = await fetchMatches({ tournament_id });
-        const total = await Match.countDocuments({ tournament_id });
+        const [data, total] = await Promise.all([
+            fetchMatches({ tournament_id }),
+            Match.countDocuments({ tournament_id })
+        ]);
         return res.json({
             status: true,
             data,
@@ -375,14 +377,46 @@ export const getMatchList = asyncHandler(async (req, res) => {
 
     if (!isAdmin) {
         const tournaments = await Tournament.find({ status: { $ne: false } }).sort({ start_date: -1 }).lean();
-        const grouped = [];
-        for (const t of tournaments) {
-            const matches = await fetchMatches({ tournament_id: t._id });
-            if (matches.today.length || matches.upcoming.length || matches.previous.length) {
-                grouped.push({ tournament: t, matches });
-            }
+        const results = await Promise.all(
+            tournaments.map(async (t) => {
+                const matches = await fetchMatches({ tournament_id: t._id }, true);
+                return { tournament: t, matches };
+            })
+        );
+
+        const filteredResults = results.filter(
+            (res) =>
+                res.matches.today.length ||
+                res.matches.upcoming.length ||
+                res.matches.previous.length
+        );
+
+        if (lang !== 'en' && filteredResults.length > 0) {
+            const allMatches = [];
+            filteredResults.forEach((res) => {
+                allMatches.push(...res.matches.today, ...res.matches.upcoming, ...res.matches.previous);
+            });
+
+            const translatedMatches = await translateData(allMatches, ['venue'], lang);
+
+            let index = 0;
+            filteredResults.forEach((res) => {
+                const todayLen = res.matches.today.length;
+                const upcomingLen = res.matches.upcoming.length;
+                const previousLen = res.matches.previous.length;
+
+                res.matches.today = translatedMatches.slice(index, index + todayLen);
+                index += todayLen;
+
+                res.matches.upcoming = translatedMatches.slice(index, index + upcomingLen);
+                index += upcomingLen;
+
+                res.matches.previous = translatedMatches.slice(index, index + previousLen);
+                index += previousLen;
+            });
         }
-        return res.json({ status: true, grouped: true, data: grouped });
+
+        return res.json({ status: true, grouped: true, data: filteredResults });
     }
 
     // Default for Admin: List all matches across all tournaments
@@ -392,7 +426,7 @@ export const getMatchList = asyncHandler(async (req, res) => {
 
     const [matches, total] = await Promise.all([
         Match.find({})
-            .populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name', 'team_color')
+            .populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color')
             .populate('tournament_id', 'name short_name')
             .sort({ [sortField]: sortOrder })
             .skip(skip)
