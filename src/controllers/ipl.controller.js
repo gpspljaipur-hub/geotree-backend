@@ -377,46 +377,71 @@ export const getMatchList = asyncHandler(async (req, res) => {
 
     if (!isAdmin) {
         const tournaments = await Tournament.find({ status: { $ne: false } }).sort({ start_date: -1 }).lean();
-        const results = await Promise.all(
-            tournaments.map(async (t) => {
-                const matches = await fetchMatches({ tournament_id: t._id }, true);
-                return { tournament: t, matches };
-            })
-        );
+        const tournamentIds = tournaments.map(t => t._id);
 
-        const filteredResults = results.filter(
-            (res) =>
-                res.matches.today.length ||
-                res.matches.upcoming.length ||
-                res.matches.previous.length
-        );
+        const today = new Date();
+        const { status } = getRequestParams(req, ['status']);
+        const matchFilter = { tournament_id: { $in: tournamentIds } };
+        if (status !== undefined) matchFilter.status = parseBoolean(status);
+        else matchFilter.status = { $ne: false };
 
-        if (lang !== 'en' && filteredResults.length > 0) {
-            const allMatches = [];
-            filteredResults.forEach((res) => {
-                allMatches.push(...res.matches.today, ...res.matches.upcoming, ...res.matches.previous);
-            });
+        today.setHours(0, 0, 0, 0);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(tomorrow.getDate() + 1);
 
-            const translatedMatches = await translateData(allMatches, ['venue'], lang);
+        // Fetch all matches for all active tournaments in a SINGLE query to avoid round-trips
+        const allMatches = await Match.find(matchFilter)
+            .populate('team1_id team2_id winner_team_id', 'team_name team_logo team_short_name team_color')
+            .lean();
 
-            let index = 0;
-            filteredResults.forEach((res) => {
-                const todayLen = res.matches.today.length;
-                const upcomingLen = res.matches.upcoming.length;
-                const previousLen = res.matches.previous.length;
-
-                res.matches.today = translatedMatches.slice(index, index + todayLen);
-                index += todayLen;
-
-                res.matches.upcoming = translatedMatches.slice(index, index + upcomingLen);
-                index += upcomingLen;
-
-                res.matches.previous = translatedMatches.slice(index, index + previousLen);
-                index += previousLen;
-            });
+        // Perform translation in bulk to avoid multiple cached translation calls
+        let translatedMatches = allMatches;
+        if (lang !== 'en' && allMatches.length > 0) {
+            translatedMatches = await translateData(allMatches, ['venue'], lang);
         }
 
-        return res.json({ status: true, grouped: true, data: filteredResults });
+        const skip = (Number(page) - 1) * Number(limit);
+        const limitNum = Number(limit);
+
+        const grouped = [];
+        for (const t of tournaments) {
+            const tIdStr = t._id.toString();
+            const tMatches = translatedMatches.filter(m => m.tournament_id && m.tournament_id.toString() === tIdStr);
+
+            // Today matches (ongoing or upcoming on today's date)
+            const todayMatches = tMatches.filter(m => 
+                ['live', 'ongoing'].includes(m.match_status) || 
+                (m.match_status === 'upcoming' && m.match_date >= today && m.match_date < tomorrow)
+            );
+            todayMatches.sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
+
+            // Upcoming matches (upcoming on tomorrow's date or later)
+            const upcomingMatches = tMatches.filter(m => 
+                m.match_status === 'upcoming' && m.match_date >= tomorrow
+            );
+            upcomingMatches.sort((a, b) => new Date(a.match_date) - new Date(b.match_date));
+            const paginatedUpcoming = upcomingMatches.slice(skip, skip + limitNum);
+
+            // Previous matches (completed or previous)
+            const previousMatches = tMatches.filter(m => 
+                ['completed', 'previous'].includes(m.match_status)
+            );
+            previousMatches.sort((a, b) => new Date(b.match_date) - new Date(a.match_date));
+            const paginatedPrevious = previousMatches.slice(skip, skip + limitNum);
+
+            if (todayMatches.length || paginatedUpcoming.length || paginatedPrevious.length) {
+                grouped.push({
+                    tournament: t,
+                    matches: {
+                        today: todayMatches,
+                        upcoming: paginatedUpcoming,
+                        previous: paginatedPrevious
+                    }
+                });
+            }
+        }
+
+        return res.json({ status: true, grouped: true, data: grouped });
     }
 
     // Default for Admin: List all matches across all tournaments
