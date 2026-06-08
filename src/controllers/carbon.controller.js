@@ -17,34 +17,19 @@ let factorsLastUpdated = 0;
 let isSeeded = false;
 const CACHE_TTL = 1000 * 60 * 60; // 1 hour
 
-// const SEED_FACTORS = [
-//   { category: 'transport', sub_category: 'Car (Diesel)', value: 'car_diesel', factor: 0.171, unit: 'kg/km' },
-//   { category: 'transport', sub_category: 'Car (Petrol)', value: 'car_petrol', factor: 0.192, unit: 'kg/km' },
-//   { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.103, unit: 'kg/km' },
-//   { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.089, unit: 'kg/km' },
-//   { category: 'transport', sub_category: 'Train', value: 'train', factor: 0.041, unit: 'kg/km' },
-//   { category: 'transport', sub_category: 'Flight (Long Haul)', value: 'flight_long', factor: 450, unit: 'kg/flight' },
-//   { category: 'transport', sub_category: 'Flight (Short Haul)', value: 'flight_short', factor: 150, unit: 'kg/flight' },
-//   { category: 'energy', sub_category: 'Electricity', value: 'electricity', factor: 0.82, unit: 'kg/kWh' },
-//   { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 2.983, unit: 'kg/kg' },
-//   { category: 'waste', sub_category: 'General Waste', value: 'waste', factor: 0.5, unit: 'kg/kg' },
-//   { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 7.0, unit: 'kg/meal' },
-//   { category: 'food', sub_category: 'Vegetarian', value: 'vegetarian', factor: 2.0, unit: 'kg/meal' },
-//   { category: 'food', sub_category: 'Vegan', value: 'vegan', factor: 1.1, unit: 'kg/meal' }
-// ];
 
 const SEED_FACTORS = [
   { category: 'transport', sub_category: 'Car (Diesel)', value: 'car_diesel', factor: 0.17, unit: 'kg/km' },
   { category: 'transport', sub_category: 'Car (Petrol)', value: 'car_petrol', factor: 0.19, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.09, unit: 'kg/km' },
-  { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.08, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Motorbike', value: 'motorbike', factor: 0.10, unit: 'kg/km' },
+  { category: 'transport', sub_category: 'Bus', value: 'bus', factor: 0.089, unit: 'kg/km' },
   { category: 'transport', sub_category: 'Train', value: 'train', factor: 0.04, unit: 'kg/km' },
   { category: 'transport', sub_category: 'Flight (Long Haul)', value: 'flight_long', factor: 450, unit: 'kg/flight' },
   { category: 'transport', sub_category: 'Flight (Short Haul)', value: 'flight_short', factor: 150, unit: 'kg/flight' },
   { category: 'energy', sub_category: 'Electricity', value: 'electricity', factor: 0.82, unit: 'kg/kWh' },
-  { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 42.5, unit: 'kg/kg' },
+  { category: 'energy', sub_category: 'LPG', value: 'lpg', factor: 42.6, unit: 'kg/kg' },
   { category: 'waste', sub_category: 'General Waste', value: 'waste', factor: 0.45, unit: 'kg/kg' },
-  { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 6.0, unit: 'kg/meal' },
+  { category: 'food', sub_category: 'Non-Vegetarian', value: 'non_vegetarian', factor: 7.0, unit: 'kg/meal' },
   { category: 'food', sub_category: 'Vegetarian', value: 'vegetarian', factor: 2.0, unit: 'kg/meal' },
   { category: 'food', sub_category: 'Vegan', value: 'vegan', factor: 1.5, unit: 'kg/meal' }
 ];
