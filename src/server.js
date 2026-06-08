@@ -100,7 +100,6 @@ const allowedOrigins = process.env.CORS_ORIGIN
 
 app.use(
   cors({
-
     // origin: (origin, callback) => {
     //   if (!origin) return callback(null, true);
 
@@ -137,7 +136,7 @@ app.use(
     optionsSuccessStatus: 200,
   }),
 );
-
+app.options("*", cors());
 app.use(compression());
 
 app.use(
