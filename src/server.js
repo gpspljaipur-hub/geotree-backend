@@ -95,32 +95,35 @@ app.use(
 
 // 2. CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",").map(o => o.trim())
+  ? process.env.CORS_ORIGIN.split(",")
   : [];
 
 app.use(
   cors({
-    origin: (origin, callback) => {
-      if (!origin) return callback(null, true);
 
-      if (process.env.NODE_ENV?.toLowerCase() === "development") {
-        return callback(null, true);
-      }
-      if (allowedOrigins.length === 0) {
-        console.error(
-          "⚠️  CORS_ORIGIN is not set in production — all cross-origin requests blocked.",
-        );
-        return callback(
-          new Error("CORS not configured. Contact the server administrator."),
-        );
-      }
+    // origin: (origin, callback) => {
+    //   if (!origin) return callback(null, true);
 
-      if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
+    //   if (process.env.NODE_ENV?.toLowerCase() === "development") {
+    //     return callback(null, true);
+    //   }
+    //   if (allowedOrigins.length === 0) {
+    //     console.error(
+    //       "⚠️  CORS_ORIGIN is not set in production — all cross-origin requests blocked.",
+    //     );
+    //     return callback(
+    //       new Error("CORS not configured. Contact the server administrator."),
+    //     );
+    //   }
 
-      callback(new Error("Not allowed by CORS"));
-    },
+    //   if (allowedOrigins.includes("*") || allowedOrigins.includes(origin)) {
+    //     return callback(null, true);
+    //   }
+
+    //   callback(new Error("Not allowed by CORS"));
+    // },
+    origin: true,
+    credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
     allowedHeaders: [
       "Origin",
@@ -131,7 +134,6 @@ app.use(
       "Content-Length",
       "lang",
     ],
-    credentials: true,
     optionsSuccessStatus: 200,
   }),
 );
