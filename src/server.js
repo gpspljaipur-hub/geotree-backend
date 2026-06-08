@@ -50,32 +50,16 @@ console.log("JWT_SECRET:", process.env.JWT_SECRET);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Environment configuration is handled by import "dotenv/config" at the top
-
 mongoose.set("bufferCommands", false);
 
 const app = express();
-
-// ==========================================
-// � High Performance & Scaling Config
-// ==========================================
-// Trust the Load Balancer/Reverse Proxy (AWS, Nginx, Cloudflare)
-// This ensures Rate Limiting uses the REAL user IP, not the Proxy IP.
 app.set("trust proxy", 1);
 
-// ==========================================
-// �🛡️ Security & Performance Middleware
-// ==========================================
-
-// 0. Logging
 if (process.env.NODE_ENV === "development") {
-  app.use(morgan("dev")); // Detailed logs for development
+  app.use(morgan("dev"));
 } else {
-  app.use(morgan("combined")); // Standard Apache combined log for production
+  app.use(morgan("combined"));
 }
-
-// 1. HTTP Headers Security
-// CSP must allow the actual origin (IP or hostname), not just hardcoded localhost
 const PORT_NUM = process.env.PORT || 5030;
 app.use(
   helmet({
@@ -111,22 +95,17 @@ app.use(
 
 // 2. CORS Configuration
 const allowedOrigins = process.env.CORS_ORIGIN
-  ? process.env.CORS_ORIGIN.split(",")
+  ? process.env.CORS_ORIGIN.split(",").map(o => o.trim())
   : [];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (mobile apps, curl, Postman)
       if (!origin) return callback(null, true);
 
-      // In development, allow ANY origin
       if (process.env.NODE_ENV?.toLowerCase() === "development") {
         return callback(null, true);
       }
-
-      // FIX: In production, FAIL CLOSED if no whitelist is configured.
-      // Previously this silently allowed all origins — a security risk.
       if (allowedOrigins.length === 0) {
         console.error(
           "⚠️  CORS_ORIGIN is not set in production — all cross-origin requests blocked.",
@@ -157,36 +136,8 @@ app.use(
   }),
 );
 
-// 3. Data Sanitization (Applied after body parsing below)
-
-// Rate Limiting is currently DISABLED.
-// To re-enable, uncomment all blocks below and test gradually.
-// Auth routes: very tight (10 requests per 15 minutes per IP)
-// const authLimiter = rateLimit({
-//   windowMs: 15 * 60 * 1000,
-//   max: 10,
-//   message: { status: false, message: 'Too many authentication attempts. Please try again after 15 minutes.' },
-//   standardHeaders: true,
-//   legacyHeaders: false
-// });
-
-// General API routes (100 per minute per IP)
-// const apiLimiter = rateLimit({
-//   windowMs: 1 * 60 * 1000,
-//   max: process.env.NODE_ENV?.toLowerCase() === 'production' ? 100 : 1000,
-//   message: { status: false, message: 'Too many requests from this IP, please try again later.' },
-//   standardHeaders: true,
-//   legacyHeaders: false,
-//   skip: (req) => req.path === '/api/health' || req.path === '/'
-// });
-
-// 5. Compression (Gzip)
 app.use(compression());
 
-// 6. Logging (Moved to top)
-
-// Body parsing: URL encoded & JSON
-// Increased limits to allow base64 profile image uploads
 app.use(
   express.json({
     limit: "10mb",
@@ -196,11 +147,7 @@ app.use(
   }),
 );
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
-
-// Data Sanitization against NoSQL Query Injection
 app.use(mongoSanitize);
-
-// Ensure public/uploads and subdirectories exist
 const uploadBase = path.join(__dirname, "../public/uploads");
 const subDirs = ["profile", "state", "category", "occasion", "species"];
 
@@ -210,8 +157,6 @@ const subDirs = ["profile", "state", "category", "occasion", "species"];
     console.log(`📂 Created directory: ${dir}`);
   }
 });
-
-// Apply CORS specifically to static assets to ensure external clients can read images
 app.use(
   "/uploads",
   cors(),
@@ -222,34 +167,23 @@ app.use(
   express.static(uploadBase),
 );
 
-// Serve generated occasion HTML forms — accessible via GET /forms/occasion-<id>.html
 const formsDir = path.join(__dirname, "../public/forms");
 if (!fs.existsSync(formsDir)) fs.mkdirSync(formsDir, { recursive: true });
 app.use("/forms", cors(), express.static(formsDir));
 app.use(express.static(path.join(__dirname, "../public")));
 
-// Serve public directory for static HTML pages
 app.use(express.static(path.join(__dirname, "../public")));
-
 const startServer = async () => {
   try {
     await connectDB();
-
-    // Seed Super Admin on startup
     await seedAdmin();
-
-    // ── Rate Limiters (currently DISABLED — uncomment to re-enable) ──────────
-    // app.use("/api/auth", authLimiter, authRoutes);
-    // app.use("/api/", apiLimiter);
     app.use("/api/auth", authRoutes);
-
     app.use("/api/admin", adminRoutes);
     app.use("/api/admin-ui", adminUiRoutes);
     app.use("/api/audit", auditRoutes);
     app.use("/api/carbon", carbonRoutes);
     app.use("/api/category", categoryRoutes);
     app.use("/api/certificate", certificateRoutes);
-
     app.use("/api/ipl", iplRoutes);
     app.use("/api/master", masterRoutes);
     app.use("/api/monitoring", monitoringRoutes);
@@ -302,9 +236,6 @@ const startServer = async () => {
       console.log(`🌍 Environment: ${process.env.NODE_ENV}`);
     });
 
-    // ==========================================
-    // Graceful Shutdown Handlers
-    // ==========================================
     const gracefulShutdown = async (signal) => {
       console.log(`\n⚠️  ${signal} received. Starting graceful shutdown...`);
 
