@@ -83,71 +83,172 @@ export const uploadLocationExcel = asyncHandler(async (req, res) => {
 
 // @desc    Get unique states (from LocationData — reflects what was imported)
 export const getStates = asyncHandler(async (req, res) => {
-    // Aggregate by name string ('state') to ensure all unique imported states are shown.
-    // Grouping by 'state_id' would collapse all unlinked states into a single null group.
-    const states = await LocationData.aggregate([
-        {
-            $group: {
-                _id: "$state",
-                state_id: { $max: "$state_id" }
-            }
-        },
-        {
-            $project: {
-                // Use state_id if available, otherwise fallback to name string for the value
-                _id: { $ifNull: ["$state_id", "$_id"] },
-                state_name: "$_id"
-            }
-        },
-        { $sort: { state_name: 1 } }
-    ]);
-    res.json({ status: true, data: states });
+    // Check nested structure first (imported JSON file)
+    const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
+    let states = [];
+    if (nestedDoc && nestedDoc.states && nestedDoc.states.length > 0) {
+        states = nestedDoc.states.map(s => s.state || s.state_name).filter(Boolean);
+    } else {
+        // Flat structure
+        states = await LocationData.distinct('state');
+    }
+
+    if (!states || states.length === 0) {
+        // Fallback to State collection if locationData has not been imported yet
+        const stateDocs = await State.find({ status: true }).select('state_name').lean();
+        states = stateDocs.map(s => s.state_name).filter(Boolean);
+    }
+
+    const formattedStates = states.sort().map(state => ({
+        _id: state,
+        state_name: state
+    }));
+    res.json({ status: true, data: formattedStates });
 });
 
 // @desc    Get districts for a state
 export const getDistricts = asyncHandler(async (req, res) => {
-    const { state_id, state } = req.query;
-    if (!state_id && !state) throw new ApiError(400, "state_id or state is required");
+    const { state } = req.body;
+    if (!state) throw new ApiError(400, "state is required");
+    const trimmedState = state.trim();
 
-    const filter = state_id ? { state_id } : { state };
-    const districts = await LocationData.distinct('district', filter);
-    res.json({ status: true, data: districts.sort() });
+    // Check nested structure first
+    const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
+    let districts = [];
+    if (nestedDoc && nestedDoc.states) {
+        const stateMatch = nestedDoc.states.find(s => 
+            (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
+        );
+        if (stateMatch && stateMatch.districts) {
+            districts = stateMatch.districts.map(d => typeof d === 'string' ? d : (d.district || d.district_name || d));
+        }
+    } else {
+        // Flat structure
+        districts = await LocationData.distinct('district', { state: trimmedState });
+    }
+
+    const formattedDistricts = districts.sort().map(district => ({
+        _id: district,
+        district_name: district
+    }));
+    res.json({ status: true, data: formattedDistricts });
 });
 
 // @desc    Get blocks for a state + district
 export const getBlocks = asyncHandler(async (req, res) => {
-    const { state_id, state, district } = req.query;
-    if (!state_id && !state) throw new ApiError(400, "state_id or state is required");
+    const { state, district } = req.body;
+    if (!state) throw new ApiError(400, "state is required");
     if (!district) throw new ApiError(400, "district is required");
 
-    const filter = state_id ? { state_id, district } : { state, district };
-    const blocks = await LocationData.distinct('block', filter);
+    const trimmedState = state.trim();
+    const trimmedDistrict = district.trim();
+
+    // Check nested structure first
+    const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
+    let blocks = [];
+    if (nestedDoc && nestedDoc.states) {
+        const stateMatch = nestedDoc.states.find(s => 
+            (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
+        );
+        if (stateMatch && stateMatch.districts) {
+            const distMatch = stateMatch.districts.find(d => 
+                (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
+            );
+            if (distMatch && distMatch.blocks) {
+                blocks = distMatch.blocks.map(b => typeof b === 'string' ? b : (b.block || b.block_name || b));
+            }
+        }
+    } else {
+        // Flat structure
+        blocks = await LocationData.distinct('block', { state: trimmedState, district: trimmedDistrict });
+    }
+
     res.json({ status: true, data: blocks.sort() });
 });
 
 // @desc    Get gram panchayats
 export const getGPs = asyncHandler(async (req, res) => {
-    const { state_id, state, district, block } = req.query;
-    if (!state_id && !state) throw new ApiError(400, "state_id or state is required");
+    const { state, district, block } = req.body;
+    if (!state) throw new ApiError(400, "state is required");
 
-    const filter = state_id ? { state_id } : { state };
-    if (district) filter.district = district;
-    if (block) filter.block = block;
+    const trimmedState = state.trim();
+    const trimmedDistrict = district ? district.trim() : null;
+    const trimmedBlock = block ? block.trim() : null;
 
-    const gps = await LocationData.distinct('gram_panchayat', filter);
+    // Check nested structure first
+    const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
+    let gps = [];
+    if (nestedDoc && nestedDoc.states) {
+        const stateMatch = nestedDoc.states.find(s => 
+            (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
+        );
+        if (stateMatch && stateMatch.districts && trimmedDistrict) {
+            const distMatch = stateMatch.districts.find(d => 
+                (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
+            );
+            if (distMatch && distMatch.blocks && trimmedBlock) {
+                const blockMatch = distMatch.blocks.find(b => 
+                    (typeof b === 'string' ? b : (b.block || b.block_name || b)).trim().toLowerCase() === trimmedBlock.toLowerCase()
+                );
+                if (blockMatch && blockMatch.gram_panchayats) {
+                    gps = blockMatch.gram_panchayats;
+                }
+            }
+        }
+    } else {
+        // Flat structure
+        const filter = { state: trimmedState };
+        if (trimmedDistrict) filter.district = trimmedDistrict;
+        if (trimmedBlock) filter.block = trimmedBlock;
+        gps = await LocationData.distinct('gram_panchayat', filter);
+    }
+
     res.json({ status: true, data: gps.sort() });
 });
 
 // @desc    Get villages
 export const getVillages = asyncHandler(async (req, res) => {
-    const { state_id, state, district, block, gram_panchayat } = req.query;
-    if (!state_id && !state) throw new ApiError(400, "state_id or state is required");
+    const { state, district, block, gram_panchayat } = req.body;
+    if (!state) throw new ApiError(400, "state is required");
 
-    const filter = state_id ? { state_id } : { state };
-    if (district) filter.district = district;
-    if (block) filter.block = block;
-    if (gram_panchayat) filter.gram_panchayat = gram_panchayat;
+    const trimmedState = state.trim();
+    const trimmedDistrict = district ? district.trim() : null;
+    const trimmedBlock = block ? block.trim() : null;
+    const trimmedGP = gram_panchayat ? gram_panchayat.trim() : null;
 
-    const villages = await LocationData.distinct('village', filter);
+    // Check nested structure first
+    const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
+    let villages = [];
+    if (nestedDoc && nestedDoc.states) {
+        const stateMatch = nestedDoc.states.find(s => 
+            (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
+        );
+        if (stateMatch && stateMatch.districts && trimmedDistrict) {
+            const distMatch = stateMatch.districts.find(d => 
+                (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
+            );
+            if (distMatch && distMatch.blocks && trimmedBlock) {
+                const blockMatch = distMatch.blocks.find(b => 
+                    (typeof b === 'string' ? b : (b.block || b.block_name || b)).trim().toLowerCase() === trimmedBlock.toLowerCase()
+                );
+                if (blockMatch && blockMatch.gram_panchayats && trimmedGP) {
+                    const gpMatch = blockMatch.gram_panchayats.find(gp => 
+                        (typeof gp === 'string' ? gp : (gp.gram_panchayat || gp.gp_name || gp)).trim().toLowerCase() === trimmedGP.toLowerCase()
+                    );
+                    if (gpMatch && gpMatch.villages) {
+                        villages = gpMatch.villages;
+                    }
+                }
+            }
+        }
+    } else {
+        // Flat structure
+        const filter = { state: trimmedState };
+        if (trimmedDistrict) filter.district = trimmedDistrict;
+        if (trimmedBlock) filter.block = trimmedBlock;
+        if (trimmedGP) filter.gram_panchayat = trimmedGP;
+        villages = await LocationData.distinct('village', filter);
+    }
+
     res.json({ status: true, data: villages.sort() });
 });

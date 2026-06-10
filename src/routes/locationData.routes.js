@@ -23,11 +23,11 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 
 // Public/Shared dropdown routes
-router.get('/states', locationController.getStates);
-router.get('/districts', locationController.getDistricts);
-router.get('/blocks', locationController.getBlocks);
-router.get('/gps', locationController.getGPs);
-router.get('/villages', locationController.getVillages);
+router.post('/states', locationController.getStates);
+router.post('/districts', locationController.getDistricts);
+router.post('/blocks', locationController.getBlocks);
+router.post('/gps', locationController.getGPs);
+router.post('/villages', locationController.getVillages);
 
 // Admin only: Upload Excel
 router.post('/upload-excel', [
