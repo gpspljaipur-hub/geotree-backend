@@ -116,7 +116,7 @@ export const getDistricts = asyncHandler(async (req, res) => {
     const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
     let districts = [];
     if (nestedDoc && nestedDoc.states) {
-        const stateMatch = nestedDoc.states.find(s => 
+        const stateMatch = nestedDoc.states.find(s =>
             (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
         );
         if (stateMatch && stateMatch.districts) {
@@ -147,11 +147,11 @@ export const getBlocks = asyncHandler(async (req, res) => {
     const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
     let blocks = [];
     if (nestedDoc && nestedDoc.states) {
-        const stateMatch = nestedDoc.states.find(s => 
+        const stateMatch = nestedDoc.states.find(s =>
             (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
         );
         if (stateMatch && stateMatch.districts) {
-            const distMatch = stateMatch.districts.find(d => 
+            const distMatch = stateMatch.districts.find(d =>
                 (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
             );
             if (distMatch && distMatch.blocks) {
@@ -170,24 +170,22 @@ export const getBlocks = asyncHandler(async (req, res) => {
 export const getGPs = asyncHandler(async (req, res) => {
     const { state, district, block } = req.body;
     if (!state) throw new ApiError(400, "state is required");
-
     const trimmedState = state.trim();
     const trimmedDistrict = district ? district.trim() : null;
     const trimmedBlock = block ? block.trim() : null;
 
-    // Check nested structure first
     const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
     let gps = [];
     if (nestedDoc && nestedDoc.states) {
-        const stateMatch = nestedDoc.states.find(s => 
+        const stateMatch = nestedDoc.states.find(s =>
             (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
         );
         if (stateMatch && stateMatch.districts && trimmedDistrict) {
-            const distMatch = stateMatch.districts.find(d => 
+            const distMatch = stateMatch.districts.find(d =>
                 (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
             );
             if (distMatch && distMatch.blocks && trimmedBlock) {
-                const blockMatch = distMatch.blocks.find(b => 
+                const blockMatch = distMatch.blocks.find(b =>
                     (typeof b === 'string' ? b : (b.block || b.block_name || b)).trim().toLowerCase() === trimmedBlock.toLowerCase()
                 );
                 if (blockMatch && blockMatch.gram_panchayats) {
@@ -220,19 +218,19 @@ export const getVillages = asyncHandler(async (req, res) => {
     const nestedDoc = await LocationData.findOne({ states: { $exists: true } }).lean();
     let villages = [];
     if (nestedDoc && nestedDoc.states) {
-        const stateMatch = nestedDoc.states.find(s => 
+        const stateMatch = nestedDoc.states.find(s =>
             (s.state || s.state_name || "").trim().toLowerCase() === trimmedState.toLowerCase()
         );
         if (stateMatch && stateMatch.districts && trimmedDistrict) {
-            const distMatch = stateMatch.districts.find(d => 
+            const distMatch = stateMatch.districts.find(d =>
                 (typeof d === 'string' ? d : (d.district || d.district_name || d)).trim().toLowerCase() === trimmedDistrict.toLowerCase()
             );
             if (distMatch && distMatch.blocks && trimmedBlock) {
-                const blockMatch = distMatch.blocks.find(b => 
+                const blockMatch = distMatch.blocks.find(b =>
                     (typeof b === 'string' ? b : (b.block || b.block_name || b)).trim().toLowerCase() === trimmedBlock.toLowerCase()
                 );
                 if (blockMatch && blockMatch.gram_panchayats && trimmedGP) {
-                    const gpMatch = blockMatch.gram_panchayats.find(gp => 
+                    const gpMatch = blockMatch.gram_panchayats.find(gp =>
                         (typeof gp === 'string' ? gp : (gp.gram_panchayat || gp.gp_name || gp)).trim().toLowerCase() === trimmedGP.toLowerCase()
                     );
                     if (gpMatch && gpMatch.villages) {
