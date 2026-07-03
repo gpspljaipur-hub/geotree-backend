@@ -7,7 +7,7 @@ const CategorySchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['Carbon', 'Plantation', 'Occasion'],
+    enum: ['Carbon', 'Plantation', 'Occasion', 'Sponsor'],
     required: true,
     index: true
   },
