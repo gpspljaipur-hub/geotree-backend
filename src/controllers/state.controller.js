@@ -52,7 +52,7 @@ export const uploadStateImageMiddleware = (req, res, next) => {
 
 // @desc    Get state list
 export const getStateList = asyncHandler(async (req, res) => {
-  const { lang, status, page = 1, limit = 10, search, sort = 'state_name' } = getRequestParams(req, ['lang', 'status', 'page', 'limit', 'search', 'sort']);
+  const { lang, status, page = 1, limit = 10, search, sort = 'state_name', is_popular } = getRequestParams(req, ['lang', 'status', 'page', 'limit', 'search', 'sort', 'is_popular']);
   const isAdmin = req.user?.role === 'admin' || req.user?.role === 'super_admin';
 
   const filter = {};
@@ -64,6 +64,10 @@ export const getStateList = asyncHandler(async (req, res) => {
 
   if (search) {
     filter.state_name = { $regex: search, $options: 'i' };
+  }
+  
+  if (is_popular !== undefined) {
+    filter.is_popular = parseBoolean(is_popular);
   }
 
   const skip = (Number(page) - 1) * Number(limit);
@@ -79,7 +83,14 @@ export const getStateList = asyncHandler(async (req, res) => {
     State.countDocuments(filter)
   ]);
 
-  let finalData = states;
+  let finalData = states.map(state => ({
+    ...state,
+    tree_count: state.tree_count || "0",
+    project_count: state.project_count || 0,
+    native_species: state.native_species || [],
+    is_popular: state.is_popular || false,
+    badge: state.badge || ""
+  }));
 
   if (lang !== 'en') {
     finalData = await translateData(finalData, ['state_name', 'description'], lang);
@@ -129,17 +140,31 @@ export const getHierarchy = asyncHandler(async (req, res) => {
 
 // @desc    Add new state
 export const addState = asyncHandler(async (req, res) => {
-  const { state_name, name, description, status } = req.body;
+  const { state_name, name, description, status, tree_count, project_count, native_species, is_popular, badge } = req.body;
   const stateName = state_name || name;
 
   if (!stateName) throw new ApiError(400, "state_name is required");
   if (!req.file) throw new ApiError(400, "state_image is required");
 
+  let parsedSpecies = [];
+  if (native_species) {
+      if (Array.isArray(native_species)) {
+          parsedSpecies = native_species;
+      } else if (typeof native_species === 'string') {
+          parsedSpecies = native_species.split(',').map(s => s.trim()).filter(Boolean);
+      }
+  }
+
   const state = await State.create({
     state_name: stateName,
     description,
     status: status !== undefined ? parseBoolean(status) : true,
-    state_image: `/uploads/state/${req.file.filename}`
+    state_image: `/uploads/state/${req.file.filename}`,
+    tree_count: tree_count || "0",
+    project_count: project_count ? Number(project_count) : 0,
+    native_species: parsedSpecies,
+    is_popular: is_popular !== undefined ? parseBoolean(is_popular) : false,
+    badge
   });
 
   const stateObj = state.toObject();
@@ -156,6 +181,13 @@ export const updateState = asyncHandler(async (req, res) => {
   if (!state) throw new ApiError(404, "State not found");
 
   const updateSet = { ...req.body };
+
+  if (updateSet.native_species !== undefined) {
+      if (typeof updateSet.native_species === 'string') {
+          updateSet.native_species = updateSet.native_species.split(',').map(s => s.trim()).filter(Boolean);
+      }
+  }
+  if (updateSet.is_popular !== undefined) updateSet.is_popular = parseBoolean(updateSet.is_popular);
 
   if (!req.file && (req.body.state_image === "" || req.body.state_image === "null" || req.body.state_image === null)) {
     throw new ApiError(400, "state_image is required");

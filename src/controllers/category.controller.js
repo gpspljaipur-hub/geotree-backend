@@ -104,8 +104,8 @@ export const addCategory = asyncHandler(async (req, res) => {
   if (!name || !type || !description) throw new ApiError(400, "name, type, and description are required");
   if (!req.file) throw new ApiError(400, "category_image is required");
 
-  if (!['Carbon', 'Plantation', 'Occasion'].includes(type)) {
-    throw new ApiError(400, "type must be Carbon, Plantation, or Occasion");
+  if (!['Carbon', 'Plantation', 'Occasion','Gift', 'Sponsor'].includes(type)) {
+    throw new ApiError(400, "type must be Carbon, Plantation, Occasion,Gift, or Sponsor");
   }
 
   try {
@@ -140,7 +140,12 @@ export const updateCategory = asyncHandler(async (req, res) => {
   const { name, type, description, status } = req.body;
   const updateData = {};
   if (name) updateData.name = name;
-  if (type) updateData.type = type;
+  if (type) {
+    if (!['Carbon', 'Plantation', 'Occasion', 'Sponsor'].includes(type)) {
+      throw new ApiError(400, "type must be Carbon, Plantation, Occasion, or Sponsor");
+    }
+    updateData.type = type;
+  }
   if (description) updateData.description = description;
   if (status !== undefined) updateData.status = parseBoolean(status);
 

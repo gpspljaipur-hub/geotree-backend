@@ -22,6 +22,24 @@ const StateSchema = new mongoose.Schema({
     type: Boolean,
     default: true,
     index: true
+  },
+  tree_count: {
+    type: String,
+    default: "0"
+  },
+  project_count: {
+    type: Number,
+    default: 0
+  },
+  native_species: [{
+    type: String
+  }],
+  is_popular: {
+    type: Boolean,
+    default: false
+  },
+  badge: {
+    type: String
   }
 }, { timestamps: true });
 
